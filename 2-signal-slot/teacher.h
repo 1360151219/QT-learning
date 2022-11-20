@@ -13,8 +13,7 @@ signals:
     // 自定义信号
     // 返回值是void
     void finishClass();
-
-
+    void finishClass(QString food);
 };
 
 #endif // TEACHER_H

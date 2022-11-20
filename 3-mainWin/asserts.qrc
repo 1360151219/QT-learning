@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>psfe.jpeg</file>
+    </qresource>
+</RCC>

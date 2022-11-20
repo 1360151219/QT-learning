@@ -9,6 +9,7 @@ public:
     explicit Student(QObject *parent = nullptr);
     // 槽函数可以直接写在public里
     void eat();
+    void eat(QString food);
 signals:
 
 };

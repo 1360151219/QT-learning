@@ -10,22 +10,13 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
-    secondwidget.cpp \
-    student.cpp \
-    teacher.cpp \
-    widget.cpp
+    mainwindow.cpp
 
 HEADERS += \
-    secondwidget.h \
-    student.h \
-    teacher.h \
-    widget.h
-
-FORMS += \
-    widget.ui
+    mainwindow.h
 
 TRANSLATIONS += \
-    2-signal-slot_zh_CN.ts
+    3-mainWin_zh_CN.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 
@@ -33,3 +24,6 @@ CONFIG += embed_translations
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    asserts.qrc
