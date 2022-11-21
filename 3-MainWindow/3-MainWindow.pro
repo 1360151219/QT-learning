@@ -15,10 +15,8 @@ SOURCES += \
 HEADERS += \
     mainwindow.h
 
-TRANSLATIONS += \
-    3-mainWin_zh_CN.ts
-CONFIG += lrelease
-CONFIG += embed_translations
+FORMS += \
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
