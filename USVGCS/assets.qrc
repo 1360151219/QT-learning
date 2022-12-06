@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>bdmap/map.html</file>
+    </qresource>
+</RCC>
