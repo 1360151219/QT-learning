@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1600)
-# pragma execution_character_set("utf-8")
+#pragma execution_character_set("utf-8")
 #endif
 
 #include <QMainWindow>
@@ -13,8 +13,9 @@
 #include <QSerialPort>
 #include "usv.h"
 
-namespace Ui {
-class MainWindow;
+namespace Ui
+{
+    class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -24,11 +25,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-public slots:
-    void getMousePoint(QString lng, QString lat);
-    void getBalls(int ballId, double ballLng, double ballLat, int ballColor);
-
+    void setMousePoint(QString lng, QString lat);
+    void usvAppendBall(int ballId, double ballLng, double ballLat, int ballColor);
 private slots:
     void readTcpData();
     void showTcpError(QAbstractSocket::SocketError socketError);
@@ -72,7 +70,6 @@ private:
 
     void updateLabel();
     void sendSimUSVStatus();
-
 };
 
 #endif // MAINWINDOW_H

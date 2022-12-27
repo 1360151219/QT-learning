@@ -7,6 +7,7 @@
 #include <QFile>
 #include "./usv/USV/mavlink.h" //此处路径需要修改
 
+#include "jsbchannel.h";
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
                                           ui(new Ui::MainWindow)
 {
@@ -21,12 +22,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     // 嵌入h5
     page = new QWebEnginePage(this);
-    // page -> load(QUrl("D:/qtstudy/USVGCS/bdmap/map.html")); //此处路径需要修改
     page->load(QUrl("file:///Applications/workplace/QT-project/USVGCS/bdmap/map.html"));
-    this->channel = new QWebChannel(this);
-    this->channel->registerObject(QString("passId"), this);
-    page->setWebChannel(channel);
     this->ui->widget_web->setPage(page);
+    // 建立jsb
+    JsbChannel *jsbChannel = new JsbChannel(this);
+    this->channel = new QWebChannel(this);
+    this->channel->registerObject("jsbChannel", jsbChannel);
+    page->setWebChannel(channel);
+    connect(jsbChannel, &JsbChannel::Mousemove, this, &MainWindow::setMousePoint);
+    connect(jsbChannel, &JsbChannel::AppendBall, this, &MainWindow::usvAppendBall);
 
     // 建立链接
     this->tcpClinet = new QTcpSocket(this);
@@ -126,13 +130,12 @@ void MainWindow::showTcpError(QAbstractSocket::SocketError socketError)
     QMessageBox::critical(this, "TCP连接错误", QString("错误代码：%1\n错误原因：%2").arg(socketError).arg(tcpClinet->errorString()));
 }
 
-void MainWindow::getMousePoint(QString lng, QString lat)
+void MainWindow::setMousePoint(QString lng, QString lat)
 {
     this->ui->label_mouse_lng->setText(lng);
     this->ui->label_mouse_lat->setText(lat);
 }
-
-void MainWindow::getBalls(int ballId, double ballLng, double ballLat, int ballColor)
+void MainWindow::usvAppendBall(int ballId, double ballLng, double ballLat, int ballColor)
 {
     if (ballId == 0)
     {
@@ -160,7 +163,6 @@ void MainWindow::getBalls(int ballId, double ballLng, double ballLat, int ballCo
         break;
     }
 }
-
 void MainWindow::on_pushButton_addBall_clicked()
 {
     double ballLng = this->ui->lineEdit_ballLng->text().toDouble();

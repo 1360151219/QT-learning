@@ -27,11 +27,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+    jsbchannel.cpp \
         main.cpp \
         mainwindow.cpp \
     usv.cpp
 
 HEADERS += \
+    jsbchannel.h \
         mainwindow.h \
     usv.h
 

@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -18,7 +19,10 @@
         #container {
             height: 100%
         }
-		.anchorBL{display:none}
+
+        .anchorBL {
+            display: none
+        }
     </style>
     <script type="text/javascript" src="http://api.map.baidu.com/getscript?v=3.0&ak=jAGYII0SilHGQue6XffDAR3R1TcuDytE">
         //v3.0版本的引用方式：src="http://api.map.baidu.com/api?v=3.0&ak=您的密钥"
@@ -28,10 +32,11 @@
     <link rel="stylesheet" href="library_DrawingManager_1.4_src_DrawingManager_min.css" />
     <script type="text/javascript" src="qwebchannel.js"></script>
 </head>
+
 <body>
-    <div>debug</div>
     <div id="container"></div>
 </body>
+
 </html>
 
 <script type="text/javascript">
@@ -40,7 +45,7 @@
     map.enableScrollWheelZoom(); //开启滚轮缩放
     map.disableDoubleClickZoom();
     map.addControl(new BMap.NavigationControl({ type: BMAP_NAVIGATION_CONTROL_LARGE, showZoomInfo: true }));
-    map.addControl(new BMap.MapTypeControl({ mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP], anchor: BMAP_ANCHOR_TOP_LEFT, offset: new BMap.Size(80, 50)}));
+    map.addControl(new BMap.MapTypeControl({ mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP], anchor: BMAP_ANCHOR_TOP_LEFT, offset: new BMap.Size(80, 50) }));
     map.addControl(new BMap.ScaleControl({ anchor: BMAP_ANCHOR_TOP_LEFT }));
 
     var boatMarker = new BMap.Marker;  //船的marker
@@ -94,7 +99,7 @@
 
     function taskOverlaysComplete(e) {
         var len = taskOverlays.push(e.overlay);
-        taskOverlays[len-1].addEventListener("click", overlay_style);
+        taskOverlays[len - 1].addEventListener("click", overlay_style);
     }
     drawingManager.addEventListener("overlaycomplete", taskOverlaysComplete);
 
@@ -134,8 +139,7 @@
         }
     }
 
-    map.addEventListener("click", function (e)
-    {
+    map.addEventListener("click", function (e) {
         //var wgsBallPoint = bd09towgs84(e.point.lng, e.point.lat)
         //addBall(wgsBallPoint[0], wgsBallPoint[1],"red");
     });
@@ -152,14 +156,14 @@
             case 4: color = "black"; break;
             default: break;
         }
-        var len=ballMarkers.push( new BMap.Marker(new BMap.Point(newBall[0], newBall[1]), {
+        var len = ballMarkers.push(new BMap.Marker(new BMap.Point(newBall[0], newBall[1]), {
             icon: new BMap.Symbol(BMap_Symbol_SHAPE_CIRCLE, {
                 scale: 5,//图标缩放大小
                 strokeWeight: 0.1,
                 fillColor: color,//填充颜色
                 fillOpacity: 0.6//填充透明度
             }),
-            title: ballMarkers.length+','+ lng.toString() + ',' + lat.toString()
+            title: ballMarkers.length + ',' + lng.toString() + ',' + lat.toString()
         }));
         map.addOverlay(ballMarkers[len - 1]);
         ballColors.push(colorIndex);
@@ -183,10 +187,10 @@
         }
     }
 
-        new QWebChannel(qt.webChannelTransport,
-    function(channel){
-        window.bridge=channel.objects.passId;//注册一个通道,将桥梁连接到qt下的passId，形成通路
-    });
+    new QWebChannel(qt.webChannelTransport,
+        function (channel) {
+            window.bridge = channel.objects.jsbChannel;//注册一个通道,将桥梁连接到qt下的passId，形成通路
+        });
 
     function transInfo(e) {
         var wgsPoint = bd09towgs84(e.point.lng, e.point.lat);
@@ -328,4 +332,3 @@
     }
 
 </script>
-
