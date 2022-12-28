@@ -125,6 +125,7 @@ void USV::ballWgs84toxy()
     }
 }
 
+// 开始仿真航行的时候运行
 void USV::searchBall()
 {
     static int searchedBallsCount = 0;
@@ -255,6 +256,7 @@ void USV::searchBall()
     }
 }
 
+// 每次搜到新球或着航程切换规划一次，更新下一步的坐标
 void USV::planPoint()
 {
     if (!planFlag) // 每次搜到新球或着航程切换规划一次
@@ -348,7 +350,7 @@ void USV::planPoint()
             break;
         }
         planFlag = true;
-        qDebug() << planX[0] << planY[0];
+        qDebug() << "planX" << planX[0] << "planY" << planY[0];
     }
 }
 
@@ -435,6 +437,7 @@ void USV::rbbPlan(BAllCOLOR col)
 
 void USV::simulate()
 {
+    qDebug() << "simulate";
     updateXY();
     searchBall();
     planPoint();
@@ -460,6 +463,7 @@ void USV::init()
     balls.append(new BALL(113.6122846, 22.3796306, green));
     ballCount = 7;
     ballWgs84toxy();
+    // 这里终点定死了
     end_lng = 113.6127;
     end_lat = 22.3796;
     if (planX != nullptr)

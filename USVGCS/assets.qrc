@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>bdmap/map.html</file>
+        <file>data.json</file>
     </qresource>
 </RCC>

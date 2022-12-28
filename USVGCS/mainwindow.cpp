@@ -4,10 +4,9 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QSerialPortInfo>
-#include <QFile>
 #include "./usv/USV/mavlink.h" //此处路径需要修改
+#include "jsbchannel.h"
 
-#include "jsbchannel.h";
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
                                           ui(new Ui::MainWindow)
 {
@@ -37,8 +36,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     this->tcpClinet->abort(); // 取消原有连接
     connect(tcpClinet, &QTcpSocket::readyRead, this, &MainWindow::readTcpData);
     connect(tcpClinet, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), this, &MainWindow::showTcpError);
-
     serial = new QSerialPort(this);
+    QJsonArray trackedList;
+    this->trackedData.insert("trackedList", trackedList);
+    this->trackedIndex = 0;
+    this->trackedTimer = new QTimer();
 }
 
 MainWindow::~MainWindow()
@@ -57,16 +59,21 @@ void MainWindow::readTcpData()
         char c = buffer[i];
         if (mavlink_parse_char(MAVLINK_COMM_0, static_cast<unsigned char>(c), &msg, &status))
         {
-            // qDebug()<<msg.msgid;
+            qDebug() << msg.msgid;
             switch (msg.msgid)
             {
-            case MAVLINK_MSG_ID_USV_BALL:
+            case MAVLINK_MSG_ID_USV_BALL: // 152 添加球
             {
                 double ballLng = mavlink_msg_usv_ball_get_ball_lon(&msg) / 10000000.0;
                 double ballLat = mavlink_msg_usv_ball_get_ball_lat(&msg) / 10000000.0;
                 int ballColorIndex = mavlink_msg_usv_ball_get_ball_color(&msg);
+                QJsonObject currentData;
+                currentData.insert("ballLng", ballLng);
+                currentData.insert("ballLat", ballLat);
+                currentData.insert("ballColorIndex", ballColorIndex);
+                currentData.insert("type", 152);
+                trackedData.value("trackedList").toArray().append(currentData);
                 QString cmd = QString("addBall(%1,%2,%3)").arg(ballLng, 0, 'f', 8).arg(ballLat, 0, 'f', 8).arg(ballColorIndex);
-                qDebug() << "add ball";
                 page->runJavaScript(cmd);
             }
             break;
@@ -85,15 +92,28 @@ void MainWindow::readTcpData()
                 page->runJavaScript(QString("showBoatPosition(%1,%2,%3,%4)").arg(usv.current_lng, 0, 'f', 7).arg(usv.current_lat, 0, 'f', 7).arg(usv.current_course).arg(1));
             }
             break;
-            case MAVLINK_MSG_ID_USV_SIMULATION_COMMOND:
+            case MAVLINK_MSG_ID_USV_SIMULATION_COMMOND: // 154：仿真时状态
             {
+                char stage = mavlink_msg_usv_simulation_commond_get_stage(&msg);
                 usv.cmd_vel = mavlink_msg_usv_simulation_commond_get_command_velocity(&msg);
                 usv.cmd_turn = mavlink_msg_usv_simulation_commond_get_command_turn(&msg);
-                usv.calculate_xy();
-                usv.xytowgs84();
+                // 记录回放数据
+                QJsonObject currentData;
+                currentData.insert("cmd_vel", usv.cmd_vel);
+                currentData.insert("cmd_turn", usv.cmd_turn);
+                currentData.insert("type", 154);
+                QJsonArray array = this->trackedData.value("trackedList").toArray();
+                array.append(currentData);
+                // 一定要insert回去
+                this->trackedData.insert("trackedList", array);
+                QJsonDocument document;
+                document.setObject(this->trackedData);
+                QByteArray byteArray = document.toJson(QJsonDocument::Compact);
+                QFile file("/Applications/workplace/QT-project/USVGCS/data.json");
+                writeJsonFile(file, byteArray);
+
+                this->startSimulate(usv.cmd_turn, usv.cmd_vel);
                 sendSimUSVStatus();
-                updateLabel();
-                page->runJavaScript(QString("showBoatPosition(%1,%2,%3,%4)").arg(usv.current_lng, 0, 'f', 7).arg(usv.current_lat, 0, 'f', 7).arg(usv.current_course).arg(1));
             }
             break;
             case MAVLINK_MSG_ID_GCS_SET_OR_USV_ACK:
@@ -135,6 +155,7 @@ void MainWindow::setMousePoint(QString lng, QString lat)
     this->ui->label_mouse_lng->setText(lng);
     this->ui->label_mouse_lat->setText(lat);
 }
+
 void MainWindow::usvAppendBall(int ballId, double ballLng, double ballLat, int ballColor)
 {
     if (ballId == 0)
@@ -163,6 +184,32 @@ void MainWindow::usvAppendBall(int ballId, double ballLng, double ballLat, int b
         break;
     }
 }
+
+QJsonDocument MainWindow::readJsonFile(QFile &file)
+{
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QString jsonValue = file.readAll();
+    file.close();
+    QJsonParseError parseJsonErr;
+    QJsonDocument document = QJsonDocument::fromJson(jsonValue.toUtf8(), &parseJsonErr);
+    if (!(parseJsonErr.error == QJsonParseError::NoError))
+    {
+        qDebug() << tr("解析json文件错误！");
+    }
+    return document;
+}
+
+void MainWindow::writeJsonFile(QFile &file, QByteArray &data)
+{
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        qDebug() << "写入文件失败";
+        return;
+    }
+    file.write(data);
+    file.close();
+}
+
 void MainWindow::on_pushButton_addBall_clicked()
 {
     double ballLng = this->ui->lineEdit_ballLng->text().toDouble();
@@ -197,7 +244,7 @@ void MainWindow::on_pushButton_connect_clicked()
         }
     }
 }
-
+// 发送指令
 void MainWindow::on_pushButton_sendCommond_clicked()
 {
     mavlink_message_t msg;
@@ -210,6 +257,9 @@ void MainWindow::on_pushButton_sendCommond_clicked()
 void MainWindow::on_pushButton_clearMap_clicked()
 {
     page->runJavaScript(QString("clear()"));
+    this->ui->pushButton_playback->setText("开始回放");
+    this->trackedTimer->stop();
+    this->trackedIndex = 0;
 }
 
 void MainWindow::on_pushButton_showoverlays_clicked()
@@ -242,6 +292,13 @@ void MainWindow::on_pushButton_simulatorInit_clicked()
     mavlink_msg_gcs_set_or_usv_ack_pack(2, 2, &msg, 1, usv.balls.length(), 0, 0);
     uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
     tcpClinet->write(reinterpret_cast<char *>(buf), len);
+    // 定死终点
+    float end_lng = 113.6127;
+    float end_lat = 22.3796;
+    QJsonObject end;
+    end.insert("lng", end_lng);
+    end.insert("lat", end_lat);
+    this->trackedData.insert("end", end);
     if (usv.balls.length() != 0)
     {
         for (int i = 0; i < usv.balls.length(); i++)
@@ -256,16 +313,30 @@ void MainWindow::on_pushButton_simulatorInit_clicked()
         QMessageBox::warning(this, "错误", "请先加载球!");
     }
 }
-
+// 设置起点
 void MainWindow::on_pushButton_setHome_clicked()
 {
     double lng = this->ui->lineEdit_ballLng->text().toDouble();
     double lat = this->ui->lineEdit_ballLat->text().toDouble();
     usv.setHome(lng, lat, 0);
-
+    QJsonObject home;
+    home.insert("lng", lng);
+    home.insert("lat", lat);
+    this->trackedData.insert("home", home);
     mavlink_message_t msg;
     unsigned char buf[25];
     mavlink_msg_gcs_set_or_usv_ack_pack(2, 2, &msg, 2, static_cast<int>(lng * 10000000), static_cast<int>(lat * 10000000), 0);
+    uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+    tcpClinet->write(reinterpret_cast<char *>(buf), len);
+}
+// 设置终点
+void MainWindow::on_pushButton_setEnd_clicked()
+{
+    double lng = this->ui->lineEdit_ballLng->text().toDouble();
+    double lat = this->ui->lineEdit_ballLat->text().toDouble();
+    mavlink_message_t msg;
+    unsigned char buf[25];
+    mavlink_msg_gcs_set_or_usv_ack_pack(2, 2, &msg, 3, static_cast<int>(lng * 10000000), static_cast<int>(lat * 10000000), 0);
     uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
     tcpClinet->write(reinterpret_cast<char *>(buf), len);
 }
@@ -291,19 +362,6 @@ void MainWindow::sendSimUSVStatus()
     mavlink_message_t msg;
     unsigned char buf[25];
     mavlink_msg_gcs_simulation_status_pack(2, 2, &msg, static_cast<int>(usv.current_lat * 10000000), static_cast<int>(usv.current_lng * 10000000), static_cast<float>(usv.current_course));
-    uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
-    tcpClinet->write(reinterpret_cast<char *>(buf), len);
-}
-
-void MainWindow::on_pushButton_setEnd_clicked()
-{
-    double lng = this->ui->lineEdit_ballLng->text().toDouble();
-    double lat = this->ui->lineEdit_ballLat->text().toDouble();
-    lng = 113.6127;
-    lat = 22.3796;
-    mavlink_message_t msg;
-    unsigned char buf[25];
-    mavlink_msg_gcs_set_or_usv_ack_pack(2, 2, &msg, 3, static_cast<int>(lng * 10000000), static_cast<int>(lat * 10000000), 0);
     uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
     tcpClinet->write(reinterpret_cast<char *>(buf), len);
 }
@@ -343,5 +401,59 @@ void MainWindow::on_pushButton_serial_open_clicked()
         this->ui->comboBox_serial_name->setEnabled(true);
         this->ui->comboBox_serial_baud->setEnabled(true);
         this->ui->pushButton_serial_search->setEnabled(true);
+    }
+}
+void MainWindow::startSimulate(double cmdTurn, qint64 cmdVel)
+{
+    usv.cmd_vel = cmdTurn;
+    usv.cmd_turn = cmdVel;
+    usv.calculate_xy();
+    usv.xytowgs84();
+    updateLabel();
+    page->runJavaScript(QString("showBoatPosition(%1,%2,%3,%4)").arg(usv.current_lng, 0, 'f', 7).arg(usv.current_lat, 0, 'f', 7).arg(usv.current_course).arg(1));
+}
+
+void MainWindow::on_pushButton_playback_clicked()
+{
+    if (this->ui->pushButton_playback->text() == "开始回放")
+    {
+        this->ui->pushButton_playback->setText("停止回放");
+        QFile file("/Applications/workplace/QT-project/USVGCS/data.json");
+        QJsonDocument doc = this->readJsonFile(file);
+        QJsonObject object = doc.object();
+        QJsonArray array = object.value("trackedList").toArray();
+        QJsonObject home = object.value("home").toObject();
+        this->trackedTimer->start(200);
+        connect(this->trackedTimer, &QTimer::timeout, this, [=]()
+                {
+            if(trackedIndex == array.size()) {
+                // 回放完毕
+                this->ui->pushButton_playback->setText("开始回放");
+                this->trackedTimer->stop();
+                this->trackedIndex = 0;
+            }
+            if(trackedIndex == 0){
+                // 一开始设置起点
+                usv.setHome(home.value("lng").toDouble(), home.value("lat").toDouble(), 0);
+            }
+            QJsonObject item = array.at(trackedIndex).toObject();
+            double cmdTurn = item["cmd_turn"].toDouble();
+            qint64 cmdVel = item["cmd_vel"].toInt();
+            qint64 type = item["type"].toInt();
+            if(type == 154){
+                this->startSimulate(cmdTurn, cmdVel);
+            }else if(type == 152){
+                double ballLng = item["ballLng"].toDouble();
+                double ballLat = item["ballLat"].toDouble();
+                int ballColorIndex = item["ballColorIndex"].toInt();
+                QString cmd = QString("addBall(%1,%2,%3)").arg(ballLng, 0, 'f', 8).arg(ballLat, 0, 'f', 8).arg(ballColorIndex);
+                page->runJavaScript(cmd);
+            }
+            this->trackedIndex += 1; });
+    }
+    else
+    {
+        this->ui->pushButton_playback->setText("开始回放");
+        this->trackedTimer->stop();
     }
 }

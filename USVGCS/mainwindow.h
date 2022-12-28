@@ -12,7 +12,11 @@
 #include <QButtonGroup>
 #include <QSerialPort>
 #include "usv.h"
-
+#include <QFile>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QTimer>
 namespace Ui
 {
     class MainWindow;
@@ -29,8 +33,11 @@ public:
     void usvAppendBall(int ballId, double ballLng, double ballLat, int ballColor);
 private slots:
     void readTcpData();
+    void startSimulate(double cmdTurn, qint64 cmdVel);
     void showTcpError(QAbstractSocket::SocketError socketError);
 
+    QJsonDocument readJsonFile(QFile &file);
+    void writeJsonFile(QFile &file, QByteArray &data);
     void on_pushButton_addBall_clicked();
 
     void on_pushButton_connect_clicked();
@@ -59,6 +66,8 @@ private slots:
 
     void on_pushButton_serial_open_clicked();
 
+    void on_pushButton_playback_clicked();
+
 private:
     Ui::MainWindow *ui;
     QWebChannel *channel;
@@ -67,6 +76,10 @@ private:
     QButtonGroup *runOrStopGroup;
     USV usv;
     QSerialPort *serial;
+    // 回放数据
+    QJsonObject trackedData;
+    int trackedIndex;
+    QTimer *trackedTimer;
 
     void updateLabel();
     void sendSimUSVStatus();
