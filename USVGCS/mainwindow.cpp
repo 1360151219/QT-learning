@@ -76,7 +76,6 @@ void MainWindow::readTcpData()
                 array.append(currentData);
                 // 一定要insert回去
                 this->trackedData.insert("trackedList", array);
-
                 QString cmd = QString("addBall(%1,%2,%3)").arg(ballLng, 0, 'f', 8).arg(ballLat, 0, 'f', 8).arg(ballColorIndex);
                 page->runJavaScript(cmd);
             }
@@ -101,24 +100,32 @@ void MainWindow::readTcpData()
                 char stage = mavlink_msg_usv_simulation_commond_get_stage(&msg);
                 usv.cmd_vel = mavlink_msg_usv_simulation_commond_get_command_velocity(&msg);
                 usv.cmd_turn = mavlink_msg_usv_simulation_commond_get_command_turn(&msg);
+                usv.calculate_xy();
+                usv.xytowgs84();
+                sendSimUSVStatus();
+                updateLabel();
                 // 记录回放数据
                 QJsonObject currentData;
+                currentData.insert("current_x", usv.current_x);
+                currentData.insert("current_y", usv.current_y);
+                currentData.insert("current_lng", usv.current_lng);
+                currentData.insert("current_lat", usv.current_lat);
+                currentData.insert("velocity", usv.velocity);
                 currentData.insert("cmd_vel", usv.cmd_vel);
                 currentData.insert("cmd_turn", usv.cmd_turn);
+                currentData.insert("current_course", usv.current_course);
                 currentData.insert("type", 154);
                 QJsonArray array = this->trackedData.value("trackedList").toArray();
                 array.append(currentData);
                 // 一定要insert回去
                 this->trackedData.insert("trackedList", array);
+                // 更新本地数据
                 QJsonDocument document;
                 document.setObject(this->trackedData);
                 QByteArray byteArray = document.toJson(QJsonDocument::Compact);
                 QFile file("/Applications/workplace/QT-project/USVGCS/data.json");
                 writeJsonFile(file, byteArray);
-                usv.calculate_xy();
-                usv.xytowgs84();
-                sendSimUSVStatus();
-                updateLabel();
+
                 page->runJavaScript(QString("showBoatPosition(%1,%2,%3,%4)").arg(usv.current_lng, 0, 'f', 7).arg(usv.current_lat, 0, 'f', 7).arg(usv.current_course).arg(1));
                 // this->startSimulate(usv.cmd_turn, usv.cmd_vel);
             }
@@ -438,6 +445,7 @@ void MainWindow::on_pushButton_playback_clicked()
                 this->ui->pushButton_playback->setText("开始回放");
                 this->trackedTimer->stop();
                 this->trackedIndex = 0;
+                return;
             }
             if(trackedIndex == 0){
                 // 一开始设置起点
@@ -445,12 +453,25 @@ void MainWindow::on_pushButton_playback_clicked()
                 qDebug()<<"home";
             }
             QJsonObject item = array.at(trackedIndex).toObject();
+            double currentX = item["current_x"].toDouble();
+            double currentY = item["current_y"].toDouble();
+            double currentLng = item["current_lng"].toDouble();
+            double currentLat = item["current_lat"].toDouble();
+            double velocity = item["velocity"].toDouble();
+            double currentCourse = item["current_course"].toDouble();
+            double cmdVel = item["cmd_vel"].toDouble();
             double cmdTurn = item["cmd_turn"].toDouble();
-            qint64 cmdVel = item["cmd_vel"].toInt();
-            qint64 type = item["type"].toInt();
-            qDebug()<<"playback:"<<type;
+            int type = item["type"].toInt();
             if(type == 154){
-                this->startSimulate(cmdTurn, cmdVel);
+                this->ui->label_X->setText(QString::number(currentX, 'f', 1) + "m");
+                this->ui->label_Y->setText(QString::number(currentY, 'f', 1) + "m");
+                this->ui->label_boat_lng->setText(QString::number(currentLng, 'f', 7) + "°");
+                this->ui->label_boat_lat->setText(QString::number(currentLat, 'f', 7) + "°");
+                this->ui->label_boat_velocity->setText(QString::number(static_cast<double>(velocity), 'f', 1));
+                this->ui->label_boat_course->setText(QString::number(currentCourse, 'f', 1));
+                this->ui->label_boat_cmdvel->setText(QString::number(static_cast<double>(cmdVel), 'f', 2));
+                this->ui->label_boat_cmdturn->setText(QString::number(static_cast<double>(cmdTurn), 'f', 2));
+                page->runJavaScript(QString("showBoatPosition(%1,%2,%3,%4)").arg(currentLng, 0, 'f', 7).arg(currentLat, 0, 'f', 7).arg(currentCourse).arg(1));
             }else if(type == 152){
                 double ballLng = item["ballLng"].toDouble();
                 double ballLat = item["ballLat"].toDouble();
