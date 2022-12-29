@@ -72,7 +72,11 @@ void MainWindow::readTcpData()
                 currentData.insert("ballLat", ballLat);
                 currentData.insert("ballColorIndex", ballColorIndex);
                 currentData.insert("type", 152);
-                trackedData.value("trackedList").toArray().append(currentData);
+                QJsonArray array = this->trackedData.value("trackedList").toArray();
+                array.append(currentData);
+                // 一定要insert回去
+                this->trackedData.insert("trackedList", array);
+
                 QString cmd = QString("addBall(%1,%2,%3)").arg(ballLng, 0, 'f', 8).arg(ballLat, 0, 'f', 8).arg(ballColorIndex);
                 page->runJavaScript(cmd);
             }
@@ -111,9 +115,12 @@ void MainWindow::readTcpData()
                 QByteArray byteArray = document.toJson(QJsonDocument::Compact);
                 QFile file("/Applications/workplace/QT-project/USVGCS/data.json");
                 writeJsonFile(file, byteArray);
-
-                this->startSimulate(usv.cmd_turn, usv.cmd_vel);
+                usv.calculate_xy();
+                usv.xytowgs84();
                 sendSimUSVStatus();
+                updateLabel();
+                page->runJavaScript(QString("showBoatPosition(%1,%2,%3,%4)").arg(usv.current_lng, 0, 'f', 7).arg(usv.current_lat, 0, 'f', 7).arg(usv.current_course).arg(1));
+                // this->startSimulate(usv.cmd_turn, usv.cmd_vel);
             }
             break;
             case MAVLINK_MSG_ID_GCS_SET_OR_USV_ACK:
@@ -435,11 +442,13 @@ void MainWindow::on_pushButton_playback_clicked()
             if(trackedIndex == 0){
                 // 一开始设置起点
                 usv.setHome(home.value("lng").toDouble(), home.value("lat").toDouble(), 0);
+                qDebug()<<"home";
             }
             QJsonObject item = array.at(trackedIndex).toObject();
             double cmdTurn = item["cmd_turn"].toDouble();
             qint64 cmdVel = item["cmd_vel"].toInt();
             qint64 type = item["type"].toInt();
+            qDebug()<<"playback:"<<type;
             if(type == 154){
                 this->startSimulate(cmdTurn, cmdVel);
             }else if(type == 152){
