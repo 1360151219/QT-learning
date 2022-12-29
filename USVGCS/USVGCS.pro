@@ -7,6 +7,7 @@
 QT       += core gui
 QT += webenginewidgets
 QT += network serialport
+QT += charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -30,15 +31,18 @@ SOURCES += \
     jsbchannel.cpp \
         main.cpp \
         mainwindow.cpp \
-    usv.cpp
+    usv.cpp \
+    xygraph.cpp
 
 HEADERS += \
     jsbchannel.h \
         mainwindow.h \
-    usv.h
+    usv.h \
+    xygraph.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+        xygraph.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

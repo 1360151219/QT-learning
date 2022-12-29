@@ -1,5 +1,6 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "xygraph.h"
 #include <QWebEnginePage>
 #include <QDebug>
 #include <QMessageBox>
@@ -487,3 +488,15 @@ void MainWindow::on_pushButton_playback_clicked()
         this->trackedTimer->stop();
     }
 }
+
+void MainWindow::on_pushButton_showGraph_clicked()
+{
+    xyGraph *g = new xyGraph(this);
+    QFile file("/Applications/workplace/QT-project/USVGCS/data.json");
+    QJsonDocument doc = this->readJsonFile(file);
+    QJsonObject object = doc.object();
+    QJsonArray array = object.value("trackedList").toArray();
+    g->paint(array);
+    g->show();
+}
+

@@ -17,6 +17,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QTimer>
+
 namespace Ui
 {
     class MainWindow;
@@ -67,6 +68,8 @@ private slots:
     void on_pushButton_serial_open_clicked();
 
     void on_pushButton_playback_clicked();
+
+    void on_pushButton_showGraph_clicked();
 
 private:
     Ui::MainWindow *ui;
