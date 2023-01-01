@@ -122,13 +122,29 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_playback">
-            <property name="text">
-             <string>开始回放</string>
-            </property>
-            <property name="default">
-             <bool>false</bool>
-            </property>
+           <widget class="QWidget" name="widget" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <item>
+              <widget class="QPushButton" name="pushButton_playback">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>开始回放</string>
+               </property>
+               <property name="default">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_readFile">
+               <property name="text">
+                <string>导入文件</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>

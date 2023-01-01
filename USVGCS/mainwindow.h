@@ -71,6 +71,8 @@ private slots:
 
     void on_pushButton_showGraph_clicked();
 
+    void on_pushButton_readFile_clicked();
+
 private:
     Ui::MainWindow *ui;
     QWebChannel *channel;
@@ -80,6 +82,7 @@ private:
     USV usv;
     QSerialPort *serial;
     // 回放数据
+    QString path;
     QJsonObject trackedData;
     int trackedIndex;
     QTimer *trackedTimer;

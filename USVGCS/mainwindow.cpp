@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QSerialPortInfo>
+#include <QFileDialog>
 #include "./usv/USV/mavlink.h" //此处路径需要修改
 #include "jsbchannel.h"
 
@@ -433,7 +434,7 @@ void MainWindow::on_pushButton_playback_clicked()
     if (this->ui->pushButton_playback->text() == "开始回放")
     {
         this->ui->pushButton_playback->setText("停止回放");
-        QFile file("/Applications/workplace/QT-project/USVGCS/data.json");
+        QFile file(this->path);
         QJsonDocument doc = this->readJsonFile(file);
         QJsonObject object = doc.object();
         QJsonArray array = object.value("trackedList").toArray();
@@ -446,6 +447,7 @@ void MainWindow::on_pushButton_playback_clicked()
                 this->ui->pushButton_playback->setText("开始回放");
                 this->trackedTimer->stop();
                 this->trackedIndex = 0;
+                qDebug()<<"end";
                 return;
             }
             if(trackedIndex == 0){
@@ -500,3 +502,13 @@ void MainWindow::on_pushButton_showGraph_clicked()
     g->show();
 }
 
+void MainWindow::on_pushButton_readFile_clicked()
+{
+
+    this->path = QFileDialog::getOpenFileName(this, "Open", "./", "JSON Files (*.json)");
+    if (path.isEmpty() == false)
+    {
+        this->ui->pushButton_playback->setEnabled(true);
+    }
+    return;
+}
