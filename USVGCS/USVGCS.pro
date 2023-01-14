@@ -45,10 +45,8 @@ FORMS += \
         xygraph.ui
 
 # Default rules for deployment.
+# Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES += \
-    ../build-USVGCS-Desktop_Qt_5_12_12_clang_64bit-Profile/USVGCS.app.dSYM/Contents/Resources/assets.qrc \
-    assets.qrc

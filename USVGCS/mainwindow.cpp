@@ -69,15 +69,17 @@ void MainWindow::readTcpData()
                 double ballLng = mavlink_msg_usv_ball_get_ball_lon(&msg) / 10000000.0;
                 double ballLat = mavlink_msg_usv_ball_get_ball_lat(&msg) / 10000000.0;
                 int ballColorIndex = mavlink_msg_usv_ball_get_ball_color(&msg);
-                QJsonObject currentData;
-                currentData.insert("ballLng", ballLng);
-                currentData.insert("ballLat", ballLat);
-                currentData.insert("ballColorIndex", ballColorIndex);
-                currentData.insert("type", 152);
-                QJsonArray array = this->trackedData.value("trackedList").toArray();
-                array.append(currentData);
-                // 一定要insert回去
-                this->trackedData.insert("trackedList", array);
+                if(this->savePath != ""){
+                    QJsonObject currentData;
+                    currentData.insert("ballLng", ballLng);
+                    currentData.insert("ballLat", ballLat);
+                    currentData.insert("ballColorIndex", ballColorIndex);
+                    currentData.insert("type", 152);
+                    QJsonArray array = this->trackedData.value("trackedList").toArray();
+                    array.append(currentData);
+                    // 一定要insert回去
+                    this->trackedData.insert("trackedList", array);
+                }
                 QString cmd = QString("addBall(%1,%2,%3)").arg(ballLng, 0, 'f', 8).arg(ballLat, 0, 'f', 8).arg(ballColorIndex);
                 page->runJavaScript(cmd);
             }
@@ -121,13 +123,14 @@ void MainWindow::readTcpData()
                 array.append(currentData);
                 // 一定要insert回去
                 this->trackedData.insert("trackedList", array);
-                // 更新本地数据
-                QJsonDocument document;
-                document.setObject(this->trackedData);
-                QByteArray byteArray = document.toJson(QJsonDocument::Compact);
-                QFile file("/Applications/workplace/QT-project/USVGCS/data.json");
-                writeJsonFile(file, byteArray);
-
+                 if(this->savePath != ""){
+                    // 更新本地数据
+                    QJsonDocument document;
+                    document.setObject(this->trackedData);
+                    QByteArray byteArray = document.toJson(QJsonDocument::Compact);
+                    QFile file(this->savePath);
+                    writeJsonFile(file, byteArray);
+                }
                 page->runJavaScript(QString("showBoatPosition(%1,%2,%3,%4)").arg(usv.current_lng, 0, 'f', 7).arg(usv.current_lat, 0, 'f', 7).arg(usv.current_course).arg(1));
                 // this->startSimulate(usv.cmd_turn, usv.cmd_vel);
             }
@@ -263,6 +266,13 @@ void MainWindow::on_pushButton_connect_clicked()
 // 发送指令
 void MainWindow::on_pushButton_sendCommond_clicked()
 {
+    int record = QMessageBox::question(this, "是否录制", "是否要录制此次的仿真轨迹？", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (QMessageBox::Yes == record)
+    {
+        this->savePath = QFileDialog::getSaveFileName(this, "Open", "./", "JSON Files (*.json)");
+    }else{
+        this->savePath = "";
+    }
     mavlink_message_t msg;
     unsigned char buf[25];
     mavlink_msg_gcs_commond_pack(2, 2, &msg, ui->lineEdit_p->text().toFloat(), ui->lineEdit_i->text().toFloat(), ui->lineEdit_d->text().toFloat(), static_cast<unsigned char>(this->runOrStopGroup->checkedId()));
@@ -434,10 +444,11 @@ void MainWindow::on_pushButton_playback_clicked()
     if (this->ui->pushButton_playback->text() == "开始回放")
     {
         this->ui->pushButton_playback->setText("停止回放");
-        QFile file(this->path);
+        QFile file(this->trackedPath);
         QJsonDocument doc = this->readJsonFile(file);
         QJsonObject object = doc.object();
         QJsonArray array = object.value("trackedList").toArray();
+        this->trackedData.insert("trackedList", array);
         QJsonObject home = object.value("home").toObject();
         this->trackedTimer->start(200);
         connect(this->trackedTimer, &QTimer::timeout, this, [=]()
@@ -490,23 +501,19 @@ void MainWindow::on_pushButton_playback_clicked()
         this->trackedTimer->stop();
     }
 }
-
+// 生成曲线
 void MainWindow::on_pushButton_showGraph_clicked()
 {
     xyGraph *g = new xyGraph(this);
-    QFile file("/Applications/workplace/QT-project/USVGCS/data.json");
-    QJsonDocument doc = this->readJsonFile(file);
-    QJsonObject object = doc.object();
-    QJsonArray array = object.value("trackedList").toArray();
+    QJsonArray array = this->trackedData.value("trackedList").toArray();
     g->paint(array);
     g->show();
 }
 
 void MainWindow::on_pushButton_readFile_clicked()
 {
-
-    this->path = QFileDialog::getOpenFileName(this, "Open", "./", "JSON Files (*.json)");
-    if (path.isEmpty() == false)
+    this->trackedPath = QFileDialog::getOpenFileName(this, "Open", "./", "JSON Files (*.json)");
+    if (trackedPath.isEmpty() == false)
     {
         this->ui->pushButton_playback->setEnabled(true);
     }

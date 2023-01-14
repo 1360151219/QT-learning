@@ -16,5 +16,4 @@ void JsbChannel::getMousePoint(QString lng, QString lat)
 void JsbChannel::getBalls(int ballId, double ballLng, double ballLat, int ballColor)
 {
     emit AppendBall(ballId, ballLng, ballLat, ballColor);
-    //    parent->usvAppendBall(ballId, ballLng, ballLat, ballColor);
 }

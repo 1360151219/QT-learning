@@ -82,7 +82,8 @@ private:
     USV usv;
     QSerialPort *serial;
     // 回放数据
-    QString path;
+    QString trackedPath;
+    QString savePath;
     QJsonObject trackedData;
     int trackedIndex;
     QTimer *trackedTimer;
