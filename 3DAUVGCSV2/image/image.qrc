@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>auv.ico</file>
+        <file>auv.png</file>
+        <file>image.qrc</file>
+        <file>xiaohui.png</file>
+        <file>xiaozi.png</file>
+        <file>yuanhui.png</file>
+    </qresource>
+</RCC>

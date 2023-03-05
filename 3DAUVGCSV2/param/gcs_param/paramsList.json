@@ -1,0 +1,14 @@
+{
+    "1": {
+        "Name": "XeThreshold",
+        "Value": 3
+    },
+    "2": {
+        "Name": "Max WorkingTime[s] in Emergency",
+        "Value": 300
+    },
+    "3": {
+        "Name": "Max Distance[m] in Emergency",
+        "Value": 150
+    }
+}

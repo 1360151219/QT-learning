@@ -1,0 +1,7 @@
+{
+	"maxPitch": 20,
+	"maxHeel": 20,
+	"minHeight": 10,
+	"maxDepth": 10,
+	"minObstacleDis": 10
+}

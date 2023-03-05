@@ -242,6 +242,8 @@ void MainWindow::on_pushButton_connect_clicked()
 {
     if (this->ui->pushButton_connect->text() == "建立连接")
     {
+
+        
         this->tcpClinet->connectToHost(this->ui->lineEdit_ip->text(), this->ui->lineEdit_port->text().toUShort());
         if (this->tcpClinet->waitForConnected(1000))
         {

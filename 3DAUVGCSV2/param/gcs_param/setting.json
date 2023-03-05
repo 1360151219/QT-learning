@@ -1,0 +1,5 @@
+{
+	"RPIIP": "192.168.248.203",
+	"RPIPort": 8081,
+	"Rtsp": "rtsp://admin:admin@192.168.0.160:554/mpeg4"
+}
