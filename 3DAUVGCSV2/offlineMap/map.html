@@ -41,10 +41,9 @@
     <script type="text/javascript" src="./library/DrawingManager_min.js"></script>
     <link rel="stylesheet" href="./library/DrawingManager_min.css" />
     <script type="text/javascript" src="./library/qwebchannel.js"></script>
-    <script type="text/javascript" src="./library/utils/jsb.js"></script>
     <script type="text/javascript" src="./library/utils/index.js"></script>
     <script type="text/javascript" src="./library/test/index.js"></script>
-
+    <script type="text/javascript" src="./library/utils/jsb.js"></script>
     <!-- 百度地图3.0 End -->
     <title>TLAUV Map</title>
 </head>
@@ -53,8 +52,11 @@
     <div class="container">
         <div id="container"></div>
         <div class="test_toolbar">
-            <button onclick="addBoat()">添加艇</button>
             <button onclick="test1()">艇1测试</button>
+            <button onclick="test2()">艇2测试</button>
+            <button onclick="test3()">清除轨迹</button>
+            <button onclick="test4(0)">切换视图1</button>
+            <button onclick="test4(1)">切换视图2</button>
         </div>
     </div>
 </body>
@@ -90,9 +92,12 @@
     originPointMarker.setLabel(originPointLabel);
 
     // ==========================  艇的marker
-    const boatMarkerArray = []
-    const boatIconArray = []
-    const boatLabelArray = []
+    let activeId = -1;
+    let boatMarkerArray = []
+    let boatIconArray = []
+    let boatLabelArray = []
+    let boatPointsArray = [] // // 艇轨迹点
+    let boatTrackPolylineArray = [] // 艇轨迹折线
 
     function addBoat() {
         console.log('add');
@@ -104,14 +109,17 @@
             fillOpacity: 0.8
         });
         let boatLabel = new BMap.Label("0mD，0mH", { offset: new BMap.Size(20, -20) });
+        let boatPoints = new Array();  //保存艇的轨迹点
+        let boatTrackPolyline = new BMap.Polyline([], { strokeColor: getRandomColor(), strokeWeight: 2, strokeOpacity: 0.5 });
         boatLabel.setStyle({ color: "black", fontSize: "15px" });
         boatIconArray.push(boatIcon)
         boatMarkerArray.push(boatMarker)
         boatLabelArray.push(boatLabel)
+        boatPointsArray.push(boatPoints)
+        boatTrackPolylineArray.push(boatTrackPolyline)
     }
-    // ========================== 艇轨迹的初始化
-    var boatPoints = new Array();  //保存艇的轨迹点
-    var boatTrackPolyline = new BMap.Polyline([], { strokeColor: "green", strokeWeight: 2, strokeOpacity: 0.5 });
+
+
 
     // ========================== 障碍物等
     var wayPoints = new Array();
@@ -405,39 +413,39 @@
     //     }
     // }
 
-    // function clearWaypoints() {
-    //     var len = wayPointsMarker.length;
-    //     for (var i = 0; i < len; i++)
-    //         map.removeOverlay(wayPointsMarker.shift());
-    //     wayPoints = [];
-    //     map.removeOverlay(wayPointsPolyline);
-    // }
-    // function clearWayline() {
-    //     var len = polylines.length;
-    //     for (var i = 0; i < len; i++)
-    //         map.removeOverlay(polylines.shift());
-    // }
-    // function clearCircle() {
-    //     var len = circles.length;
-    //     for (var i = 0; i < len; i++)
-    //         map.removeOverlay(circles.shift());
-    // }
-    // function clearZone() {
-    //     var len = polygon.length;
-    //     for (var i = 0; i < len; i++)
-    //         map.removeOverlay(polygon.shift());
-    // }
-    // function clearAll() {
-    //     clearTrack();
-    //     clearWaypoints();
-    //     clearWayline();
-    //     clearCircle();
-    //     clearZone();
-    //     map.clearOverlays();
-    // }
-    // function reLoadMap() {
-    //     window.bridge.reloadMap();
-    // }
+    function clearWaypoints() {
+        var len = wayPointsMarker.length;
+        for (var i = 0; i < len; i++)
+            map.removeOverlay(wayPointsMarker.shift());
+        wayPoints = [];
+        map.removeOverlay(wayPointsPolyline);
+    }
+    function clearWayline() {
+        var len = polylines.length;
+        for (var i = 0; i < len; i++)
+            map.removeOverlay(polylines.shift());
+    }
+    function clearCircle() {
+        var len = circles.length;
+        for (var i = 0; i < len; i++)
+            map.removeOverlay(circles.shift());
+    }
+    function clearZone() {
+        var len = polygon.length;
+        for (var i = 0; i < len; i++)
+            map.removeOverlay(polygon.shift());
+    }
+    function clearAll() {
+        clearTrack();
+        clearWaypoints();
+        clearWayline();
+        clearCircle();
+        clearZone();
+        map.clearOverlays();
+    }
+    function reLoadMap() {
+        window.bridge.reloadMap();
+    }
 
     // var menu = new BMap.ContextMenu();
     // var txtToolMenuItem = [
