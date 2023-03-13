@@ -33,6 +33,7 @@
             display: none
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.2/proj4.js"></script>
     <!-- 百度地图3.0 离线API Begin -->
     <script type="text/javascript" src="./map3.0_init.js"></script>
     <script type="text/javascript" src="./map3.0.js"></script>
@@ -92,7 +93,7 @@
     originPointMarker.setLabel(originPointLabel);
 
     // ==========================  艇的marker
-    let activeId = -1;
+    let activeId = -1; // @new 目前正在显示的艇的id
     let boatMarkerArray = []
     let boatIconArray = []
     let boatLabelArray = []

@@ -131,7 +131,7 @@ void MainWindow::paramTableInit()
 void MainWindow::tableModelInit()
 {
     QFile jsonFile(QDir::currentPath() + "/param/gcs_param/paramsList.json");
-//    qDebug()<<QDir::currentPath() + "/param/gcs_param/paramsList.json";
+    //    qDebug()<<QDir::currentPath() + "/param/gcs_param/paramsList.json";
     if (!jsonFile.open(QIODevice::ReadOnly))
     {
         this->ui->statusBar->showMessage("Json文件打开失败，请重试", 2000);
@@ -213,7 +213,7 @@ void MainWindow::mavlinkRead(QByteArray buf)
                 //                this->ui->widget_gaugeCompassPan->setValue(static_cast<double>(usv.yaw));
                 //                this->ui->widget_gaugePlane->setRollValue(static_cast<int>(usv.pitch));
                 //                this->ui->widget_gaugePlane->setDegValue(static_cast<int>(usv.roll));
-                mapChannel->updateBoatPos(usv.lng,usv.lat,static_cast<double>(usv.yaw),0);
+                mapChannel->updateBoatPos(usv.lng, usv.lat, static_cast<double>(usv.yaw), 0);
                 break;
             case MAVLINK_MSG_ID_USV_HEARTBEAT:
                 usv.mode = mavlink_msg_usv_heartbeat_get_mode(&msg);
@@ -402,7 +402,7 @@ void MainWindow::on_pushButton_tcp_connect_clicked()
         jsonFile.close();
         QString ip = rootObj.value("RPIIP").toString();
         int port = rootObj.value("RPIPort").toInt();
-        qDebug()<<"tcp连接："<<ip<<port;
+        qDebug() << "tcp连接：" << ip << port;
         this->usvClient->connectToHost(ip, static_cast<quint16>(port));
         if (this->usvClient->waitForConnected(1000))
         {
