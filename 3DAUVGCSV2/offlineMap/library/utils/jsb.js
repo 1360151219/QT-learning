@@ -8,23 +8,27 @@ const L = 0.00944 // 海里
  * @param {0} depth 深度
  */
 let polygona;
-function showBoatPosition(id, lng, lat, course, depth) {
+// todo: 参数的封装
+function showBoatPosition(id, lng, lat, course, depth, quaternionOpacity) {
+  var currentPosition = wgs84tobd09(lng, lat);
+
   // ===== 四元安全领域绘制
   const { r_fore, r_aft, r_starb, r_port } = Quaternion(v, L)
   // console.log(r_fore,r_aft,r_port,r_starb);
   const obj = {
-    fore: newCoordinate(lng, lat, r_fore, 90),
-    starb: newCoordinate(lng, lat, r_starb, 0),
+    fore: newCoordinate(lng, lat, r_fore, 0), // 从上开始顺时针
+    starb: newCoordinate(lng, lat, r_starb, 90),
     aft: newCoordinate(lng, lat, r_aft, 270),
     port: newCoordinate(lng, lat, r_port, 180)
   }
-  const arr = Object.keys(obj).map(key => obj[key])
+  const x_axis = ((obj.starb[0] - obj.port[0]))
+  const y_axis = ((obj.fore[1] - obj.aft[1]))
   map.removeOverlay(polygona)
-  polygona = new BMap.Polygon(arr.map(([a, b]) => new BMap.Point(a, b)), { strokeColor: "blue", strokeWeight: 1, strokeOpacity: 0.1 });
+  let a = ellipse({ lng: currentPosition[0], lat: currentPosition[1] }, x_axis, y_axis);
+  polygona = new BMap.Polygon(a, { strokeColor: "black", strokeStyle:'dashed', strokeWeight: 1, fillOpacity: quaternionOpacity });
   map.addOverlay(polygona);
 
   // =====
-  var currentPosition = wgs84tobd09(lng, lat);
   const currentPoint = new BMap.Point(currentPosition[0], currentPosition[1]);
   const boatIcon = boatIconArray[id]
   const boatLabel = boatLabelArray[id]
