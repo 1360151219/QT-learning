@@ -40,32 +40,84 @@ function test4(id) {
 }
 
 function test5() {
+  const dt = 1;
+  const vv = 0.9063728 * 0.5144;
+  const course = 2.49905759162304;
+  const r = -0.0387085514834206;
+  let psi = 2.40523560209424
+  let x = -110.355637
+  let y = 105.503448
+  setInterval(() => {
+    showBoatPrediction(
+      x,
+      y,
+      psi,
+      vv * Math.cos(course - psi),
+      vv * Math.sin(course - psi),
+      r,
+      0,
+      1000,
+      false,
+      dt,
+      0,
+      5
+    )
+  }, 1000)
+}
+function test6() {
   let t = 0.01;
   const dt = 0.01;
-  const v = 0.0987648 * 0.5144;
-  const course = 0.536457242582897;
-  const r = 0.00261780104712042
-  let psi = 1.19249563699825
-  let x = 15.76954
-  let y = 26.169334
+  const vv = 0.1291144 * 0.5144;
+  const course = 5.62731239092496
+  let r = 0.0303664921465969
+  let psi = 0.143630017452007
+  let x = 8.56009
+  let y = -2.005358
+  let u = vv * Math.cos(course - psi)
+  let v = vv * Math.sin(course - psi)
+  let boatMarker = new BMap.Marker;
+  let boatIcon = new BMap.Symbol(BMap_Symbol_SHAPE_FORWARD_CLOSED_ARROW, { //BMap_Symbol_SHAPE_PLANE
+    scale: 1,
+    strokeWeight: 1,
+    fillColor: "red",
+    fillOpacity: 0.8
+  });
+  let boatTrackPolyline = new BMap.Polyline([], { strokeColor: 'red', strokeWeight: 2, strokeOpacity: 0.5 });
+  let boatPoints = []
   setInterval(() => {
     const res = getPrediction({
       x,
       y,
       psi,
-      u: v * Math.cos(course - psi),
-      v: v * Math.sin(course - psi),
+      u,
+      v,
       r,
-      angle:0,
-      PWM:1000,
-      isDynamic:false,
+      angle: -0.785340314136126,
+      PWM: 1300,
+      isDynamic: true,
       t,
       dt
     })
-    console.log(res);
     x = res.x
     y = res.y
+    u = res.u
+    v = res.v
     psi = res.psi
-    t = t+res.dt
+    r = res.r
+    t = t + res.dt
+    console.log(res);
+    const wgs84Pos = XYZtoBLH(x, y)
+    const bd09Pos = wgs84tobd09(wgs84Pos.lon, wgs84Pos.lat)
+    const currentPoint = new BMap.Point(bd09Pos[0], bd09Pos[1]);
+    boatMarker.setPosition(currentPoint);
+    boatMarker.setIcon(boatIcon);
+    boatPoints.push(currentPoint);
+    boatTrackPolyline.setPath(boatPoints);
+    map.addOverlay(boatMarker);
+    if (boatPoints.length == 1) {
+      // 添加轨迹折线
+      map.addOverlay(boatTrackPolyline);
+    }
+
   }, 1000)
 }
