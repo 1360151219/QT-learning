@@ -103,6 +103,12 @@ function XYZtoBLH(x, y) {
   const lat2 = 31.115167
   const x2 = -110.78701
   const y2 = 105.870926
+  if (x === x1 && y === y1) {
+    return { lon: lon1, lat: lat1 }
+  }
+  if (x === x2 && y === y2) {
+    return { lon: lon2, lat: lat2 }
+  }
   let lon_cos = Math.cos(lat2 * Math.PI / 180);
   let m = (lon2 - lon1) * lon_cos;
   let n = lat2 - lat1;
@@ -110,9 +116,11 @@ function XYZtoBLH(x, y) {
   let N = y2 - y1;
   let P = x - x1;
   let Q = y - y1;
+
   let a = (P * P + Q * Q) * (m * m + n * n) / (M * M + N * N);
   let b = (M * P + Q * N) * Math.sqrt(n * n + m * m) * Math.sqrt(a) / (Math.sqrt(N * N + M * M) * Math.sqrt(P * P + Q * Q));
   let c = Math.sqrt(b * b * n * n - (m * m + n * n) * (b * b - a * m * m));
+
   let q1 = (b * n + c) / (m * m + n * n);
   let q2 = (b * n - c) / (m * m + n * n);
   let p1 = (b - q1 * n) / m;
@@ -137,6 +145,69 @@ function XYZtoBLH(x, y) {
   return { lon, lat }
 }
 
+function BLHtoXYZ(lon, lat) {
+  const lon1 = 114.466975
+  const lat1 = 31.115171
+  const x1 = -110.355637
+  const y1 = 105.503448
+  const lon2 = 114.466979
+  const lat2 = 31.115167
+  const x2 = -110.78701
+  const y2 = 105.870926
+  if (lon === lon1 && lat === lat1) {
+    return { x: x1, y: y1 }
+  }
+  if (lon === lon2 && lat === lat2) {
+    return { x: x2, y: y2 }
+  }
+  const lon_cos = Math.cos((lat2 * Math.PI) / 180);
+
+  const m = (lon2 - lon1) * lon_cos;
+  const n = lat2 - lat1;
+  const p = (lon - lon1) * lon_cos;
+  const q = lat - lat1;
+
+  const M = x2 - x1;
+  const N = y2 - y1;
+
+  const a = ((p * p + q * q) * (M * M + N * N)) / (m * m + n * n);
+  const b =
+    (m * p + q * n) *
+    norm(M, N) * Math.sqrt(a) /
+    (norm(m, n) * norm(p, q));
+
+  const c = Math.sqrt(b * b * N * N - (M * M + N * N) * (b * b - a * M * M));
+
+  const Q1 = (b * N + c) / (M * M + N * N);
+  const Q2 = (b * N - c) / (M * M + N * N);
+
+  const P1 = (b - Q1 * N) / M;
+  const P2 = (b - Q2 * N) / M;
+
+  const x_1 = P1 + x1;
+  const y_1 = Q1 + y1;
+  const x_2 = P2 + x1;
+  const y_2 = Q2 + y1;
+
+  const judge1 = (x_1 - x1) * (y2 - y1) - (y_1 - y1) * (x2 - x1);
+  const judge2 = (x_2 - x1) * (y2 - y1) - (y_2 - y1) * (x2 - x1);
+  const judge = (lon - lon1) * (lat2 - lat1) - (lat - lat1) * (lon2 - lon1);
+
+  let x = 0;
+  let y = 0;
+  if (judge * judge1 < 0) {
+    x = x_1;
+    y = y_1;
+  } else {
+    x = x_2;
+    y = y_2;
+  }
+  function norm(a, b) {
+    return Math.sqrt(a * a + b * b);
+  }
+  return { x, y }
+
+}
 // 无人艇的固定参数
 const a_11 = -0.8455; const a_12 = -1.6741; const a_13 = -4.5662; const a_14 = 0.0065; const a_15 = 0.1174;
 const a_21 = -0.3197; const a_22 = -3.3009; const a_23 = -0.1651; const a_24 = 2.4964; const a_25 = -0.2109;
@@ -161,7 +232,7 @@ function getPrediction({ x, y, psi, u, v, r, angle, PWM, isDynamic, dt }) {
   const new_u = u + (isDynamic ? dot_u * dt : 0);
   const new_v = v + (isDynamic ? dot_v * dt : 0);
   const new_r = r + (isDynamic ? dot_r * dt : 0);
-  
+
   return {
     x: new_x,
     y: new_y,

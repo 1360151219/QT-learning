@@ -53,6 +53,7 @@
     <div class="container">
         <div id="container"></div>
         <div class="test_toolbar">
+            <button onclick="addBoat()">添加无人艇</button>
             <button onclick="test1()">艇1测试</button>
             <button onclick="test2()">艇2测试</button>
             <button onclick="test3()">清除轨迹</button>
@@ -102,7 +103,7 @@
     let boatLabelArray = []
     let boatPointsArray = [] //  艇轨迹点
     let boatTrackPolylineArray = [] // 艇轨迹折线
-    let predictionPointsArray = [] // @new  艇预测轨迹点
+    // let predictionPointsArray = [] // @new  艇预测轨迹点
     let predictionPolylineArray = [] //  @new
     let quaternionArray = [] //  @new
     /**
@@ -122,7 +123,7 @@
         let boatPoints = new Array();  //保存艇的轨迹点
         let boatTrackPolyline = new BMap.Polyline([], { strokeColor: getRandomColor(), strokeWeight: 2, strokeOpacity: 0.5 });
         let predPoints = [];
-        let predPolyline = new BMap.Polyline([], { strokeColor: 'red', strokeWeight: 1, strokeOpacity: 0.2 });
+        let predPolyline = new BMap.Polyline([], { strokeColor: 'red', strokeWeight: 1, strokeOpacity: 1 });
         let quaternion = new BMap.Polygon(a, { strokeColor: "black", strokeStyle: 'dashed', strokeWeight: 1, fillOpacity: 0.1 });
         boatLabel.setStyle({ color: "black", fontSize: "15px" });
         boatIconArray.push(boatIcon)
@@ -130,7 +131,7 @@
         boatLabelArray.push(boatLabel)
         boatPointsArray.push(boatPoints)
         boatTrackPolylineArray.push(boatTrackPolyline)
-        predictionPointsArray.push(predPoints);
+        // predictionPointsArray.push(predPoints);
         predictionPolylineArray.push(predPolyline);
         quaternionArray.push(quaternion)
     }
@@ -459,17 +460,23 @@
     // 清除指定Id无人艇的轨迹
     function clearTrack(id) {
         boatPointsArray[id] = []
+        // predictionPointsArray[id] = []
         map.removeOverlay(boatTrackPolylineArray[id]);
         map.removeOverlay(boatMarkerArray[id])
+        map.removeOverlay(predictionPolylineArray[id])
     }
     // 清除所有无人艇的轨迹
     function clearTrackAll() {
         boatPointsArray = []
+        // predictionPointsArray = []
         for (let boatTrackPolyline of boatTrackPolylineArray) {
             map.removeOverlay(boatTrackPolyline);
         }
         for (let boatMarker of boatMarkerArray) {
             map.removeOverlay(boatMarker);
+        }
+        for (let b of predictionPolylineArray) {
+            map.removeOverlay(b)
         }
     }
     function clearAll() {

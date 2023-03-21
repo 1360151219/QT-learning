@@ -15,6 +15,7 @@ const L = 0.00944 // 175艇的艇长/海里
  */
 function showBoatPosition(id, v, lng, lat, course, depth, hasQuaternion, quaternionOpacity) {
   var currentPosition = wgs84tobd09(lng, lat);
+  console.log('boat', lng, lat, currentPosition);
 
   // ===== 四元安全领域绘制
   if (hasQuaternion) {
@@ -64,8 +65,8 @@ function showBoatPosition(id, v, lng, lat, course, depth, hasQuaternion, quatern
 }
 /**
  * 显示无人艇的预测航行轨迹
- * @param {*} initialX 横坐标
- * @param {*} initialY 纵坐标
+ * @param {*} lng 经度
+ * @param {*} lat 纬度
  * @param {*} initialPsi 艏向角
  * @param {*} initialU 横向速度
  * @param {*} initialV 纵向速度
@@ -79,8 +80,8 @@ function showBoatPosition(id, v, lng, lat, course, depth, hasQuaternion, quatern
  * @returns 
  */
 function showBoatPrediction(
-  initialX,
-  initialY,
+  lng,
+  lat,
   initialPsi,
   initialU,
   initialV,
@@ -92,13 +93,16 @@ function showBoatPrediction(
   id,
   time = 5
 ) {
-  let x = initialX;
-  let y = initialY;
+  let { x, y } = BLHtoXYZ(lng, lat);
   let psi = initialPsi;
   let u = initialU;
   let v = initialV;
   let r = initialR;
-  const predPoints = predictionPointsArray[id];
+  const predPoints = [];
+  // 初始化：加上原始点
+  const initBd09Pos = wgs84tobd09(lng, lat)
+  predPoints.push(new BMap.Point(initBd09Pos[0], initBd09Pos[1]))
+  
   const predPolyline = predictionPolylineArray[id];
   if (!predPoints || !predPolyline) {
     alert(`id为${id}的艇不存在`)
@@ -116,7 +120,6 @@ function showBoatPrediction(
       angle,
       PWM,
       isDynamic,
-      t,
       dt
     })
     // 绘制轨迹
