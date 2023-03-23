@@ -1,13 +1,9 @@
-function getRandomColor() {
-  const letters = "0123456789ABCDEF";
-  let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
+function getRandomColor(i) {
+  const map = ['red', '#990099', '#000CCC', '#ff6600', '#336600', '#6666cc', '#ff6666']
+  return map[i % 7]
 }
-
-
+// todo: 热力图
+// todo: 椭圆转向
 //centre:椭圆中心点,X:横向经度,Y:纵向纬度
 function ellipse(centre, x, y) {
   var assemble = new Array();
@@ -16,8 +12,8 @@ function ellipse(centre, x, y) {
   var tangent = x / y;
 
   for (i = 0; i < 360; i += 5) {
-    angle = (Math.PI / 180) * i;
-    dot = new BMap.Point((centre.lng + Math.sin(angle) * x * tangent), (centre.lat + Math.cos(angle) * y));
+    angle = (Math.PI / 180)*i;
+    dot = new BMap.Point((centre.lng + Math.sin(angle) * x * tangent ), (centre.lat + Math.cos(angle) * y ));
     assemble.push(dot);
   }
   return assemble;
@@ -228,7 +224,6 @@ function getPrediction({ x, y, psi, u, v, r, angle, PWM, isDynamic, dt }) {
   const new_x = x + dot_x * dt;
   const new_y = y + dot_y * dt;
   const new_psi = psi + dot_psi * dt;
-
   const new_u = u + (isDynamic ? dot_u * dt : 0);
   const new_v = v + (isDynamic ? dot_v * dt : 0);
   const new_r = r + (isDynamic ? dot_r * dt : 0);

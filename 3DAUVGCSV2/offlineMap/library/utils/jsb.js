@@ -1,6 +1,34 @@
 const L = 0.00944 // 175艇的艇长/海里
 
-
+/**
+    * 添加无人艇
+    * 【补充说明】：只有添加了无人艇，才可以通过id来对艇的位置进行显示或者显示预测轨迹
+    */
+function addBoat() {
+  console.log('add');
+  let boatMarker = new BMap.Marker;
+  let boatIcon = new BMap.Symbol(BMap_Symbol_SHAPE_FORWARD_CLOSED_ARROW, { //BMap_Symbol_SHAPE_PLANE
+    scale: 1.5,
+    strokeWeight: 1,
+    fillColor: getRandomColor(boatMarkerArray.length),
+    fillOpacity: 0.8
+  });
+  let boatLabel = new BMap.Label(`${boatMarkerArray.length}`, { offset: new BMap.Size(20, -20) });
+  let boatPoints = new Array();  //保存艇的轨迹点
+  let boatTrackPolyline = new BMap.Polyline([], { strokeColor: getRandomColor(boatMarkerArray.length), strokeWeight: 2, strokeOpacity: 0.5 });
+  let predPoints = [];
+  let predPolyline = new BMap.Polyline([], { strokeColor: getRandomColor(boatMarkerArray.length), strokeWeight: 1, strokeOpacity: 1, strokeStyle: 'dashed' });
+  let quaternion = new BMap.Polygon(a, { strokeColor: "black", strokeStyle: 'dashed', strokeWeight: 1, fillOpacity: 0.1 });
+  boatLabel.setStyle({ color: "black", fontSize: "15px" });
+  boatIconArray.push(boatIcon)
+  boatMarkerArray.push(boatMarker)
+  boatLabelArray.push(boatLabel)
+  boatPointsArray.push(boatPoints)
+  boatTrackPolylineArray.push(boatTrackPolyline)
+  // predictionPointsArray.push(predPoints);
+  predictionPolylineArray.push(predPolyline);
+  quaternionArray.push(quaternion)
+}
 /**
  * 更新船舶位置
  * 【补充说明】必须先加载对应id的无人艇后才可以使用相应的id
@@ -15,11 +43,9 @@ const L = 0.00944 // 175艇的艇长/海里
  */
 function showBoatPosition(id, v, lng, lat, course, depth, hasQuaternion, quaternionOpacity) {
   var currentPosition = wgs84tobd09(lng, lat);
-  console.log('boat', lng, lat, currentPosition);
-
+  let quaterPolygona = quaternionArray[id]
   // ===== 四元安全领域绘制
   if (hasQuaternion) {
-    let polygona = quaternionArray[id]
     const { r_fore, r_aft, r_starb, r_port } = Quaternion(v, L)
     // console.log(r_fore,r_aft,r_port,r_starb);
     const obj = {
@@ -30,10 +56,10 @@ function showBoatPosition(id, v, lng, lat, course, depth, hasQuaternion, quatern
     }
     const x_axis = ((obj.starb[0] - obj.port[0]))
     const y_axis = ((obj.fore[1] - obj.aft[1]))
-    map.removeOverlay(polygona)
+    map.removeOverlay(quaterPolygona)
     let a = ellipse({ lng: currentPosition[0], lat: currentPosition[1] }, x_axis, y_axis);
-    polygona = new BMap.Polygon(a, { strokeColor: "black", strokeStyle: 'dashed', strokeWeight: 1, fillOpacity: quaternionOpacity });
-    map.addOverlay(polygona);
+    quaterPolygona = new BMap.Polygon(a, { strokeColor: "black", strokeStyle: 'dashed', strokeWeight: 1, fillOpacity: quaternionOpacity });
+    quaternionArray[id] = quaterPolygona
   }
   // ===== 无人艇实时轨迹绘制
   const currentPoint = new BMap.Point(currentPosition[0], currentPosition[1]);
@@ -47,7 +73,7 @@ function showBoatPosition(id, v, lng, lat, course, depth, hasQuaternion, quatern
     return false
   }
   boatIcon.setRotation(course);
-  boatLabel.setContent(depth.toFixed(2) + "mD");
+  boatLabel.setContent(id);
   boatMarker.setIcon(boatIcon);
   boatMarker.setLabel(boatLabel);
   boatMarker.setPosition(currentPoint);
@@ -56,6 +82,7 @@ function showBoatPosition(id, v, lng, lat, course, depth, hasQuaternion, quatern
   // 只有全部视图或者是当前艇的视图才显示
   if (activeId === id || activeId === -1) {
     map.addOverlay(boatMarker);
+    map.addOverlay(quaterPolygona);
     if (boatPoints.length == 1) {
       // 添加轨迹折线
       map.addOverlay(boatTrackPolyline);
@@ -102,7 +129,6 @@ function showBoatPrediction(
   // 初始化：加上原始点
   const initBd09Pos = wgs84tobd09(lng, lat)
   predPoints.push(new BMap.Point(initBd09Pos[0], initBd09Pos[1]))
-  
   const predPolyline = predictionPolylineArray[id];
   if (!predPoints || !predPolyline) {
     alert(`id为${id}的艇不存在`)
@@ -110,6 +136,7 @@ function showBoatPrediction(
   }
   // 循环5次
   for (let i = 0; i < time; i++) {
+    console.log(x, y, u, v, psi, r);
     const res = getPrediction({
       x,
       y,
