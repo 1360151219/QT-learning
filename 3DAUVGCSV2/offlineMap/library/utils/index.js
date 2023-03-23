@@ -5,19 +5,24 @@ function getRandomColor(i) {
 // todo: 热力图
 // todo: 椭圆转向
 //centre:椭圆中心点,X:横向经度,Y:纵向纬度
-function ellipse(centre, x, y) {
+function ellipse(centre, x, y, course) {
   var assemble = new Array();
   var angle;
   var dot;
   var tangent = x / y;
 
   for (i = 0; i < 360; i += 5) {
-    angle = (Math.PI / 180)*i;
-    dot = new BMap.Point((centre.lng + Math.sin(angle) * x * tangent ), (centre.lat + Math.cos(angle) * y ));
+    angle = (Math.PI / 180) * i;
+    const xx = (centre.lng + Math.sin(angle) * x * tangent)
+    const yy = (centre.lat + Math.cos(angle) * y)
+    const nx = (xx - centre.lng) * Math.cos(course * Math.PI / 180) - (yy - centre.lat) * Math.sin(course * Math.PI / 180) + centre.lng
+    const ny = (yy - centre.lat) * Math.cos(course * Math.PI / 180) + (xx - centre.lng) * Math.sin(course * Math.PI / 180) + centre.lat
+    dot = new BMap.Point(nx, ny);
     assemble.push(dot);
   }
   return assemble;
 }
+
 
 function nMileToMeter(num) {
   return 1852 * num

@@ -57,7 +57,8 @@ function showBoatPosition(id, v, lng, lat, course, depth, hasQuaternion, quatern
     const x_axis = ((obj.starb[0] - obj.port[0]))
     const y_axis = ((obj.fore[1] - obj.aft[1]))
     map.removeOverlay(quaterPolygona)
-    let a = ellipse({ lng: currentPosition[0], lat: currentPosition[1] }, x_axis, y_axis);
+    let a = ellipse({ lng: currentPosition[0], lat: currentPosition[1] }, x_axis, y_axis, 180 - course);
+    // quaterPolygona = new BMap.Polygon(Object.keys(obj).map(key => new BMap.Point(obj[key][0], obj[key][1])), { strokeColor: "black", strokeStyle: 'dashed', strokeWeight: 1, fillOpacity: quaternionOpacity });
     quaterPolygona = new BMap.Polygon(a, { strokeColor: "black", strokeStyle: 'dashed', strokeWeight: 1, fillOpacity: quaternionOpacity });
     quaternionArray[id] = quaterPolygona
   }
