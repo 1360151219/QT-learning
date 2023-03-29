@@ -33,15 +33,15 @@ function addBoat() {
  * 更新船舶位置
  * 【补充说明】必须先加载对应id的无人艇后才可以使用相应的id
  * @param {number} id 艇id：从0开始
- * @param {number} v 艇速度
  * @param {number} lng 经度
  * @param {number} lat 纬度
  * @param {number} course 角度
  * @param {number} depth 深度
  * @param {boolean} hasQuaternion 是否显示四元安全领域
+ * @param {number} v 艇速度
  * @param {0-1} quaternionOpacity 四元安全领域透明度
  */
-function showBoatPosition(id, v, lng, lat, course, depth, hasQuaternion, quaternionOpacity) {
+function showBoatPosition(id, lng, lat, course, depth, hasQuaternion, v, quaternionOpacity) {
   var currentPosition = wgs84tobd09(lng, lat);
   let quaterPolygona = quaternionArray[id]
   // ===== 四元安全领域绘制
@@ -137,7 +137,6 @@ function showBoatPrediction(
   }
   // 循环5次
   for (let i = 0; i < time; i++) {
-    console.log(x, y, u, v, psi, r);
     const res = getPrediction({
       x,
       y,
@@ -162,13 +161,14 @@ function showBoatPrediction(
     psi = res.psi
     r = res.r
   }
+  alert(JSON.stringify(predPoints))
   predPolyline.setPath(predPoints);
   map.addOverlay(predPolyline);
 }
 
 // 切换无人艇
 function switchTrack(id) {
-  if (id === undefined) {
+  if (id === undefined || id === -1) {
     activeId = -1
     boatTrackPolylineArray.forEach((boatTrackPolyline, index) => {
       map.addOverlay(boatTrackPolyline);

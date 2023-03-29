@@ -20,8 +20,9 @@
 #include "qmytableviewbtndelegate.h"
 #include "qdebug.h"
 
-namespace Ui {
-class MainWindow;
+namespace Ui
+{
+    class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -40,7 +41,6 @@ private slots:
     void on_pushButton_tcp_connect_clicked();
 
     void on_comboBox_mode_currentIndexChanged(int index);
-
 
     void on_pushButton_usv_init_clicked();
 
@@ -90,10 +90,9 @@ private slots:
 
     void on_btn_Propeller_returnMid_clicked();
 
+    void on_pushButton_clicked();
 
-
-
-
+    void on_pushButton_predict_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -119,14 +118,12 @@ private:
     QStandardItemModel *tableModel;
     QMyTableViewBtnDelegate *btnDelegate;
 
-
-
     void remoteControl();
     void sendGcsSet(uint8_t type, uint16_t content);
 
     /*非模态式MessagBox*/
     QMessageBox *messageBox;
-    void showMessageBox(QMessageBox::Icon,QString,QString);
+    void showMessageBox(QMessageBox::Icon, QString, QString);
 
     /*保存上位机的记录*/
     QFile GCSFile;
@@ -143,8 +140,6 @@ private:
     TaskWidget *taskWidget;
     uint8_t maptaskType;
     uint8_t waypointsNum;
-
-
 
     QLabel *statusLabel;
     QLabel *connectLabel;

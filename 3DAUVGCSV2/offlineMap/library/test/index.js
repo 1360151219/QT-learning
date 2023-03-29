@@ -5,7 +5,7 @@ function test1() {
   let y = 0
   addBoat()
   timer1 = setInterval(() => {
-    if (!showBoatPosition(0, 13, i, j, y, 0, false)) {
+    if (!showBoatPosition(0, i, j, y, 0, false)) {
       clearInterval(timer1)
     }
     j += 0.00002
@@ -17,7 +17,7 @@ function test2() {
   let y = 0
   addBoat()
   timer1 = setInterval(() => {
-    if (!showBoatPosition(1, 13, i, j, y, 0, false)) {
+    if (!showBoatPosition(1, i, j, y, 0, false)) {
       clearInterval(timer1)
     }
     j += 0.00002
@@ -29,7 +29,7 @@ function test7() {
   let y = 0
   addBoat()
   timer1 = setInterval(() => {
-    if (!showBoatPosition(2, 13, i, j, y, 0, false)) {
+    if (!showBoatPosition(2, i, j, y, 0, false)) {
       clearInterval(timer1)
     }
     j += 0.00002
@@ -60,8 +60,9 @@ function test5() {
   let x = -110.355637
   let y = 105.503448
   let { lon, lat } = XYZtoBLH(x, y)
+  console.log(lon, lat);
   map.centerAndZoom(new BMap.Point(lon, lat), 18); // 设置地图中心点
-  if (!showBoatPosition(2, vv, lon, lat, course_degree, 0, true, 0.1)) {
+  if (!showBoatPosition(2, lon, lat, course_degree, 0, true, vv, 0.1)) {
     clearInterval(timer5)
   }
   showBoatPrediction(
@@ -76,11 +77,11 @@ function test5() {
     false,
     dt,
     2,
-    5
+    200
   )
 }
 function test6() {
-  const dt = 0.1;
+  const dt = 20;
   const vv = 0.1291144 * 0.5144;
   const course = 5.62731239092496
   const course_degree = 180 * course / Math.PI
@@ -90,7 +91,7 @@ function test6() {
   let y = -2.005358
   let { lon, lat } = XYZtoBLH(x, y)
   map.centerAndZoom(new BMap.Point(lon, lat), 18); // 设置地图中心点
-  if (!showBoatPosition(2, vv, lon, lat, course_degree, 0, true, 0.1)) {
+  if (!showBoatPosition(2, lon, lat, course_degree, 0, true, vv, 0.1)) {
     clearInterval(timer5)
   }
   showBoatPrediction(

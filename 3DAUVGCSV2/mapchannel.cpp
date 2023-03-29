@@ -1,38 +1,37 @@
 ﻿#include "mapchannel.h"
-
+#include <QDebug>
 MapChannel::MapChannel(QObject *parent) : QObject(parent)
 {
-
 }
 
 void MapChannel::getMousePoint(double lng, double lat)
 {
-    emit mousePointChanged(lng,lat);
+    emit mousePointChanged(lng, lat);
 }
 
 void MapChannel::addPoint(double lng, double lat)
 {
-    emit addPointClicked(lng,lat);
+    emit addPointClicked(lng, lat);
 }
 
 void MapChannel::movePoint(int id, double lng, double lat)
 {
-    emit movePointClicked(id,lng,lat);
+    emit movePointClicked(id, lng, lat);
 }
 
 void MapChannel::transTask(int type, int len)
 {
-    emit taskCome(type,len);
+    emit taskCome(type, len);
 }
 
 void MapChannel::transPoints(int id, double lng, double lat)
 {
-    emit pointsCome(id,lng,lat);
+    emit pointsCome(id, lng, lat);
 }
-
-void MapChannel::updateBoatPos(double lng, double lat, double course, double depth)
+// id, lng, lat, course, depth, hasQuaternion, v, quaternionOpacity
+void MapChannel::updateBoatPos(int id, double lng, double lat, double course, double depth, bool hasQuaternion, double v, double quaternionOpacity)
 {
-    emit boatPosUpdated(lng,lat,course,depth);
+    emit boatPosUpdated(id,lng, lat, course, depth, hasQuaternion, v, quaternionOpacity);
 }
 
 void MapChannel::reloadMap()
@@ -42,7 +41,7 @@ void MapChannel::reloadMap()
 
 void MapChannel::setOrigin(double lng, double lat)
 {
-    emit setOriginPoint(lng,lat);
+    emit setOriginPoint(lng, lat);
 }
 
 void MapChannel::clearWaypoints()
@@ -57,7 +56,7 @@ void MapChannel::clearAll()
 
 void MapChannel::addFencePoint(double lng, double lat)
 {
-    emit addFencePointClicked(lng,lat);
+    emit addFencePointClicked(lng, lat);
 }
 
 void MapChannel::addFence()
@@ -72,7 +71,7 @@ void MapChannel::clearFence()
 
 void MapChannel::addCablePoint(double lng, double lat)
 {
-    emit addCablePointClicked(lng,lat);
+    emit addCablePointClicked(lng, lat);
 }
 
 void MapChannel::addCable()
@@ -83,4 +82,14 @@ void MapChannel::addCable()
 void MapChannel::clearCable()
 {
     emit clearCableClicked();
+}
+
+void MapChannel::switchBoat(int id)
+{
+    emit boatSwitched(id);
+}
+void MapChannel::predictBoat(double lng, double lat, double initialPsi, double initialU, double initialV, double initialR, double angle, int PWM, bool isDynamic, double dt, int id, int time)
+{
+    qDebug()<<"test"<<lng<<lat<<initialPsi<<initialU<<initialV<<initialR<<angle<<PWM<<isDynamic<<dt<<id<<time;
+    emit boatPredicted(lng, lat, initialPsi, initialU, initialV, initialR, angle, PWM, isDynamic, dt, id, time);
 }

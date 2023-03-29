@@ -12,7 +12,7 @@ public:
     /*MainWindow 调用*/
     void addPoint(double lng, double lat);
     void movePoint(int id, double lng, double lat);
-    void updateBoatPos(double lng, double lat, double course, double depth);
+    void updateBoatPos(int id, double lng, double lat, double course, double depth, bool hasQuaternion, double v,double quaternionOpacity);
     void setOrigin(double lng, double lat);
     void addFencePoint(double,double);
     void addFence();
@@ -21,6 +21,8 @@ public:
     void addCable();
     void clearCable();
     void clearWaypoints();
+    void switchBoat(int);
+    void predictBoat(double,double,double,double,double,double,double,int,bool,double,int,int);
 
 signals:
 
@@ -34,7 +36,7 @@ signals:
     void addPointClicked(double,double);
     void movePointClicked(int,double,double);
     void setOriginPoint(double,double);
-    void boatPosUpdated(double,double,double,double);
+    void boatPosUpdated(int id, double lng, double lat, double course, double depth, bool hasQuaternion, double v,double quaternionOpacity);
     void addFencePointClicked(double,double);
     void addFenceClicked();
     void clearFenceClicked();
@@ -43,6 +45,8 @@ signals:
     void addCableClicked();
     void clearCableClicked();
     void clearAllClicked();
+    void boatSwitched(int);
+    void boatPredicted(double,double,double,double,double,double,double,int,bool,double,int,int);
 
 public slots:
     /*html调用*/
