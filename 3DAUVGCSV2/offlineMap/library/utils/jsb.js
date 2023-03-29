@@ -168,6 +168,16 @@ function showBoatPrediction(
 
 // 切换无人艇
 function switchTrack(id) {
+  if (id === undefined) {
+    activeId = -1
+    boatTrackPolylineArray.forEach((boatTrackPolyline, index) => {
+      map.addOverlay(boatTrackPolyline);
+    })
+    boatMarkerArray.forEach((boatMarker, index) => {
+      map.addOverlay(boatMarker);
+    })
+    return
+  }
   activeId = id
   boatTrackPolylineArray.forEach((boatTrackPolyline, index) => {
     if (id !== index) {
