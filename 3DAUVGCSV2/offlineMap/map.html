@@ -45,6 +45,7 @@
     <script type="text/javascript" src="./library/utils/index.js"></script>
     <script type="text/javascript" src="./library/test/index.js"></script>
     <script type="text/javascript" src="./library/utils/jsb.js"></script>
+    <script type="text/javascript" src="//api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
     <!-- 百度地图3.0 End -->
     <title>TLAUV Map</title>
 </head>
@@ -109,8 +110,30 @@
     // let predictionPointsArray = [] // @new  艇预测轨迹点
     let predictionPolylineArray = [] //  @new
     let quaternionArray = [] //  @new
+    // ============= 热力图效果 start
+    const heatOverlayMap = new BMapLib.HeatmapOverlay({ radius: 10 })
+    map.addOverlay(heatOverlayMap)
 
+    const data = [
+        // { lng: 114.43860574817542, lat: 30.52421245515915, count: 1 },
+        // {
+        //     lng: 114.4386057273996, lat: 30.524252463205336, count: 10
+        // },
+        // { lng: 114.43860572043609, lat: 30.524272467221365, count: 12 },
+        // { lng: 114.43860571345343, lat: 30.524292471232688, count: 17 },
+        // { lng: 114.43860570645168, lat: 30.524312475239313, count: 20 },
+        // { lng: 114.43860569943081, lat: 30.524332479241238, count: 27 },
+        // { lng: 114.4386056923909, lat: 30.52435248323847, count: 30 },
+    ]
 
+    heatOverlayMap.setOptions({
+        gradient: {
+            .2: 'rgb(0, 255, 255)',
+            .5: 'rgb(0, 110, 255)',
+            .8: 'rgb(100, 0, 255)'
+        }
+    })
+    // ============= 热力图效果 end
 
 
 

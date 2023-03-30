@@ -197,7 +197,6 @@ void MainWindow::mavlinkRead(QByteArray buf)
                 usv.course = mavlink_msg_usv_state_get_course(&msg);
                 usv.HDOP = mavlink_msg_usv_state_get_HDOP(&msg) / 100.f;
                 usv.SVs = mavlink_msg_usv_state_get_SVs(&msg);
-
                 this->ui->label_lng->setText(QString::number(usv.lng, 'f', 7) + "°");
                 this->ui->label_lat->setText(QString::number(usv.lat, 'f', 7) + "°");
                 this->ui->label_x->setText(QString::number(static_cast<double>(usv.x), 'f', 2) + "m");
@@ -775,10 +774,6 @@ void MainWindow::on_btn_Propeller_returnMid_clicked()
     //    emit this->ui->remotePropellerPW->sliderReleased();
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-}
-
 void MainWindow::on_pushButton_predict_clicked()
 {
     double dt = 10;
@@ -788,6 +783,6 @@ void MainWindow::on_pushButton_predict_clicked()
     double lng = 114.42649989999968;
     double lat = 30.5207794;
     double course = 5.62731239092496;
-    mapChannel->updateBoatPos(0, lng, lat, course*180/M_PI, 0, false, 0, 0);
+    mapChannel->updateBoatPos(0, lng, lat, course * 180 / M_PI, 0, false, 0, 0);
     mapChannel->predictBoat(lng, lat, psi, vv * cos(course - psi), vv * sin(course - psi), r, -0.785340314136126, 1300, false, dt, 0, 10);
 }

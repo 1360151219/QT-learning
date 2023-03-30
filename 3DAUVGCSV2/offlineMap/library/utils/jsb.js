@@ -41,8 +41,9 @@ function addBoat() {
  * @param {number} v 艇速度
  * @param {0-1} quaternionOpacity 四元安全领域透明度
  */
-function showBoatPosition(id, lng, lat, course, depth, hasQuaternion, v, quaternionOpacity) {
+function showBoatPosition(id, lng, lat, course, depth, hasQuaternion, v, quaternionOpacity = 0.1) {
   var currentPosition = wgs84tobd09(lng, lat);
+  console.log(currentPosition);
   let quaterPolygona = quaternionArray[id]
   // ===== 四元安全领域绘制
   if (hasQuaternion) {
@@ -161,7 +162,6 @@ function showBoatPrediction(
     psi = res.psi
     r = res.r
   }
-  alert(JSON.stringify(predPoints))
   predPolyline.setPath(predPoints);
   map.addOverlay(predPolyline);
 }

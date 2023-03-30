@@ -90,8 +90,6 @@ private slots:
 
     void on_btn_Propeller_returnMid_clicked();
 
-    void on_pushButton_clicked();
-
     void on_pushButton_predict_clicked();
 
 private:

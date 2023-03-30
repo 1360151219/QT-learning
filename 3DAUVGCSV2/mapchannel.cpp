@@ -90,6 +90,5 @@ void MapChannel::switchBoat(int id)
 }
 void MapChannel::predictBoat(double lng, double lat, double initialPsi, double initialU, double initialV, double initialR, double angle, int PWM, bool isDynamic, double dt, int id, int time)
 {
-    qDebug()<<"test"<<lng<<lat<<initialPsi<<initialU<<initialV<<initialR<<angle<<PWM<<isDynamic<<dt<<id<<time;
     emit boatPredicted(lng, lat, initialPsi, initialU, initialV, initialR, angle, PWM, isDynamic, dt, id, time);
 }

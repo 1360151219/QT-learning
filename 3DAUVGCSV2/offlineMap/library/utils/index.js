@@ -242,3 +242,9 @@ function getPrediction({ x, y, psi, u, v, r, angle, PWM, isDynamic, dt }) {
     r: new_r,
   }
 }
+
+//判断浏览区是否支持canvas
+function isSupportCanvas() {
+  var elem = document.createElement('canvas');
+  return !!(elem.getContext && elem.getContext('2d'));
+}

@@ -3,12 +3,18 @@ function test1() {
   let i = 114.42649989999968 // 经度
   let j = 30.5207794 // 纬度
   let y = 0
+  const data = []
   addBoat()
   timer1 = setInterval(() => {
-    if (!showBoatPosition(0, i, j, y, 0, false)) {
+    const [lng, lat] = wgs84tobd09(i, j);
+    data.push({ lng, lat, count: Math.random() * 50 })
+    heatOverlayMap.setDataSet({ max: 50, data })
+
+    if (!showBoatPosition(0, i, j, y, 0, true, 13)) {
       clearInterval(timer1)
     }
     j += 0.00002
+    y += 10
   }, 500)
 }
 function test2() {
@@ -51,7 +57,7 @@ function test4(id) {
 }
 
 function test5() {
-  const dt = 20;
+  const dt = 1;
   const vv = 0.9063728 * 0.5144;
   const course = 2.49905759162304;
   const course_degree = 180 * course / Math.PI
@@ -77,7 +83,7 @@ function test5() {
     false,
     dt,
     2,
-    200
+    40
   )
 }
 function test6() {
