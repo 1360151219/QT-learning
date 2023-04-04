@@ -94,7 +94,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
+    bool isShowPrediction;
     USV usv;
     QTcpSocket *usvClient;
     mavlink_message_t msg;

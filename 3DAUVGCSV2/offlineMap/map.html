@@ -17,18 +17,6 @@
             flex-direction: column;
         }
 
-        #container {
-            flex: 9;
-        }
-
-        .test_toolbar {
-            flex: 1;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-
-        }
-
         .anchorBL {
             display: none
         }
@@ -53,19 +41,6 @@
 <body>
     <div class="container">
         <div id="container"></div>
-        <div class="test_toolbar">
-            <button onclick="addBoat()">添加无人艇</button>
-            <button onclick="test1()">艇1测试</button>
-            <button onclick="test2()">艇2测试</button>
-            <button onclick="test7()">艇3测试</button>
-            <button onclick="test3()">清除轨迹</button>
-            <button onclick="test4(0)">切换视图1</button>
-            <button onclick="test4(1)">切换视图2</button>
-            <button onclick="test4(2)">切换视图3</button>
-            <button onclick="test4()">切换全部视图</button>
-            <button onclick="test5()">运动学预测轨迹</button>
-            <button onclick="test6()">动力学预测轨迹</button>
-        </div>
     </div>
 </body>
 
@@ -81,7 +56,7 @@
     //木兰湖百度坐标114.4797058，31.1202878
     //喻家湖百度坐标114.4375999，30.5252794
     map.centerAndZoom(new BMap.Point(114.4375999, 30.5252794), 18); // 设置地图中心点
-    //map.centerAndZoom(new BMap.Point(116.977999, 38.585401), 17);
+    //map.centerAndZoom(new BMap.Point(114.4375999，30.5252794), 17);
     //添加地图类型控件
     map.addControl(new BMap.NavigationControl({ type: BMAP_NAVIGATION_CONTROL_LARGE, showZoomInfo: true }));
     map.addControl(new BMap.MapTypeControl({ mapTypes: [BMAP_NORMAL_MAP, BMAP_HYBRID_MAP], anchor: BMAP_ANCHOR_TOP_LEFT, offset: new BMap.Size(80, 50) }));

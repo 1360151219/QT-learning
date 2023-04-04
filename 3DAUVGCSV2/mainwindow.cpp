@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 {
     ui->setupUi(this);
     this->setWindowIcon(QIcon(":/image/ship.png"));
+    this->isShowPrediction = false;
     communicateInit();
     widgetInit();
     paramTableInit();
@@ -208,11 +209,15 @@ void MainWindow::mavlinkRead(QByteArray buf)
                 this->ui->label_course_field->setText(QString::number(static_cast<double>(usv.course), 'f', 2) + "°");
                 this->ui->label_SVs->setText(QString("%1/%2").arg(usv.SVs).arg(static_cast<double>(usv.HDOP)));
                 this->ui->label_velocity->setText(QString::number(static_cast<double>(usv.velocity), 'f', 2) + "m/s");
-
                 //                this->ui->widget_gaugeCompassPan->setValue(static_cast<double>(usv.yaw));
                 //                this->ui->widget_gaugePlane->setRollValue(static_cast<int>(usv.pitch));
                 //                this->ui->widget_gaugePlane->setDegValue(static_cast<int>(usv.roll));
-                mapChannel->updateBoatPos(0, usv.lng, usv.lat, static_cast<double>(usv.yaw), 0, false, 0, 0);
+                mapChannel->updateBoatPos(0, usv.lng, usv.lat, static_cast<double>(usv.yaw) * 180 / M_PI, 0, false, 0, 0);
+                if (this->isShowPrediction)
+                {
+                    //                mapChannel->predictBoat(usv.lng, usv.lat, static_cast<double>(usv.yaw), usv.velocity * cos(usv.course - usv.yaw), usv.velocity * sin(usv.course - usv.yaw), r, -0.785340314136126, this->ui->spinBox_xunhang_pwm->text(), false, 0.01, 0, 10);
+                }
+
                 break;
             case MAVLINK_MSG_ID_USV_HEARTBEAT:
                 usv.mode = mavlink_msg_usv_heartbeat_get_mode(&msg);
@@ -776,13 +781,23 @@ void MainWindow::on_btn_Propeller_returnMid_clicked()
 
 void MainWindow::on_pushButton_predict_clicked()
 {
-    double dt = 10;
-    double vv = 0.9063728 * 0.5144;
-    double r = -0.0387085514834206;
-    double psi = 2.40523560209424;
-    double lng = 114.42649989999968;
-    double lat = 30.5207794;
-    double course = 5.62731239092496;
-    mapChannel->updateBoatPos(0, lng, lat, course * 180 / M_PI, 0, false, 0, 0);
-    mapChannel->predictBoat(lng, lat, psi, vv * cos(course - psi), vv * sin(course - psi), r, -0.785340314136126, 1300, false, dt, 0, 10);
+    if (this->isShowPrediction)
+    {
+        this->ui->pushButton_predict->setText("开始预测");
+        this->isShowPrediction = false;
+    }
+    else
+    {
+        this->ui->pushButton_predict->setText("停止预测");
+        this->isShowPrediction = true;
+    }
+    //    double dt = 10;
+    //    double vv = 0.9063728 * 0.5144;
+    //    double r = -0.0387085514834206;
+    //    double psi = 2.40523560209424;
+    //    double lng = 114.42649989999968;
+    //    double lat = 30.5207794;
+    //    double course = 5.62731239092496;
+    //    mapChannel->updateBoatPos(0, lng, lat, course * 180 / M_PI, 0, false, 0, 0);
+    //    mapChannel->predictBoat(lng, lat, psi, vv * cos(course - psi), vv * sin(course - psi), r, -0.785340314136126, 1300, false, dt, 0, 10);
 }
