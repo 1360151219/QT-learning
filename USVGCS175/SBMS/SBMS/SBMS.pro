@@ -34,7 +34,6 @@ SOURCES += \
     dataanalyse.cpp \
     datadelegate.cpp \
     datawidget.cpp \
-    qcustomplot.cpp \
     tableview.cpp \
     mfigure.cpp \
     checkboxlist.cpp \
@@ -51,7 +50,6 @@ HEADERS += \
     dataanalyse.h \
     datadelegate.h \
     datawidget.h \
-    qcustomplot.h \
     tableview.h \
     mfigure.h \
     checkboxlist.h \

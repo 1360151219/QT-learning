@@ -430,6 +430,7 @@
         for (var i = 0; i < len; i++)
             map.removeOverlay(polygon.shift());
     }
+
     // 清除指定Id无人艇的轨迹
     function clearTrack(id) {
         boatPointsArray[id] = []
@@ -438,6 +439,7 @@
         map.removeOverlay(boatMarkerArray[id])
         map.removeOverlay(predictionPolylineArray[id])
     }
+
     // 清除所有无人艇的轨迹
     function clearTrackAll() {
         boatPointsArray = []
@@ -455,6 +457,7 @@
             map.removeOverlay(q)
         }
     }
+    
     function clearAll() {
         clearTrackAll();
         clearWaypoints();

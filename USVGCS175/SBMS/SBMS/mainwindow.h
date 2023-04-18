@@ -18,10 +18,11 @@
 #include "dataanalyse.h"
 #include <QTcpSocket>
 #include <QHostAddress>
-#include ".\usv2\USV2\mavlink.h"
+#include "./usv2/USV2/mavlink.h"
 #include "INS.h"
-namespace Ui {
-class MainWindow;
+namespace Ui
+{
+    class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -56,7 +57,6 @@ private slots:
 
     void on_pushButton_do_task_clicked();
 
-
     void on_pushButton_query_param_clicked();
 
     void on_pushButton_set_param_clicked();
@@ -87,13 +87,9 @@ private slots:
 
     void on_send_neu_point_clicked();
 
-
-
     void on_LED_close_clicked();
 
     void on_pushButton_start_simulate_dock_clicked();
-
-
 
     void on_visual_set_clicked();
 
@@ -103,12 +99,11 @@ private slots:
 
     void on_TCP_AUV_Connect_clicked();
 
-
-
     void on_btn_ilos_clicked();
 
 private:
     Ui::MainWindow *ui;
+    bool isShowPrediction;
 
     USV usv;
     DOCK dock;
@@ -125,9 +120,8 @@ private:
     void sendMavlink(mavlink_message_t);
 
     /*网口通信*/
-    QTcpSocket* tcpClient;
-    QTcpSocket* tcpClient2;
-
+    QTcpSocket *tcpClient;
+    QTcpSocket *tcpClient2;
 
     /*界面*/
     int currentPageIndex = 0;
@@ -137,7 +131,7 @@ private:
 
     /*非模态式MessagBox*/
     QMessageBox *messageBox;
-    void showMessageBox(QMessageBox::Icon,QString,QString);
+    void showMessageBox(QMessageBox::Icon, QString, QString);
 
     /*地图*/
     bool isOfflineMap;
@@ -166,11 +160,10 @@ private:
     double dockHeading;
     double posNoise;
     double headingNoise;
-    double noiseDockLng, noiseDockLat,noiseDockHeading;
+    double noiseDockLng, noiseDockLat, noiseDockHeading;
     const double a = 6378137;
     const double ee = 0.00669437999;
     const double d2r = 57.2957795130;
-
 };
 
 #endif // MAINWINDOW_H

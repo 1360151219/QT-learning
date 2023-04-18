@@ -3,11 +3,11 @@
 
 #include <QWidget>
 #include <QVector>
-#include "qcustomplot.h"
 #include "tracerplus.h"
 
-namespace Ui {
-class MFigure;
+namespace Ui
+{
+    class MFigure;
 }
 
 class MFigure : public QWidget

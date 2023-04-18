@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<mavlink>
+  <!-- MAVLink standard messages -->
+  <dialect>0</dialect>
+  <!-- use common.xml enums -->
+
+  <!-- use common.xml messages -->
+  <messages>
+    <message id ="150" name="USV_STATE">
+      <description>USV state to GCS</description>
+	  <field type ="uint8_t" name="mode"></field>
+      <field type ="uint32_t" name="lng" units ="deg*E7"></field>
+      <field type ="uint32_t" name="lat" units ="deg*E7"></field>
+      <field type ="float" name="x" units ="m"></field>
+      <field type ="float" name="y" units ="m"></field>
+      <field type ="float" name="yaw" units ="deg"></field>
+	  <field type ="float" name="pitch" units="deg"></field>
+      <field type ="float" name="heel" units ="deg"></field>
+	  <field type ="float" name="velocity" units="m/s"></field>
+      <field type ="float" name="course"></field>
+	  <field type ="float" name="rudder" units ="deg"></field>
+	  <field type ="float" name="GyroZ"></field>
+	  <field type ="float" name="electric_current"></field>
+	  <field type ="float" name="voltage"></field>
+    </message>
+    <message id="151" name="GCS_SET_OR_USV_ACK">
+      <description></description>
+      <field type ="uint8_t" name ="type"></field>
+      <field type ="uint16_t" name ="content"></field>
+    </message>
+    <message id="152" name="WAYPOINTS">
+      <description>Load waypoints from GCS to USV</description>
+      <field type ="uint8_t" name ="id">Index of the waypoint</field>
+      <field type ="uint32_t" name ="lng" units ="deg*E7">Lng of the waypoint</field>
+	  <field type ="uint32_t" name ="lat" units ="deg*E7">Lat of the waypoint</field>
+    </message>
+    <message id="153" name="CONTROL_PARAM">
+      <description>Load control param from GCS to USV </description>
+      <field type ="float" name="kp"></field>
+      <field type ="float" name="ki"></field>
+      <field type ="float" name="kd"></field>
+      <field type ="float" name="los"></field>
+	  <field type ="float" name="threshold_dis"></field>
+	  <field type ="uint32_t" name="xunhang_pwm"></field>
+	  <field type ="float" name="los2"></field>
+	  <field type ="float" name="kp_Visual"></field>
+      <field type ="float" name="ki_Visual"></field>
+      <field type ="float" name="kd_Visual"></field>
+	  <field type ="float" name="kp_Vel"></field>
+	  <field type ="float" name="ki_Vel"></field>
+	  <field type ="float" name="kd_Vel"></field>
+	  <field type ="float" name="desired_vel"></field>
+    </message>
+	<message id="154" name="RC_CONTROL">
+	  <description>Load RC control param from GCS to USV </description>
+      <field type ="uint16_t" name="RC_v_PWM"></field>
+      <field type ="float" name="RC_rudder_Angle"></field>
+	</message>
+	<message id="155" name="NEUPOINT_WITH_COURSE_FOLLOW">
+	  <description>Load NEUPOINT_WITH_COURSE_FOLLOW  param from GCS to USV </description>
+      <field type ="uint32_t" name="longi_point"></field>
+      <field type ="uint32_t" name="lati_point"></field>
+	  <field type ="float" name="point_course"></field>
+	</message>
+	<message id="156" name="MANEUVERABILITY_CONTROL">
+	<description>load maneuveriability param</description>
+	<field type="float" name="Z_FI"></field>
+	<field type="float" name="Z_Z5"></field>
+	<field type="float" name="huizhuan_Angle"></field>
+    </message>
+	<message id="157" name="DOCK_MESSAGE_TRANSFORM">
+	<description></description>
+	<field type="uint32_t" name="lng"></field>
+	<field type="uint32_t" name="lat"></field>
+	<field type="float" name="velocity"></field>
+	<field type="float" name="course"></field>
+	<field type="float" name="roll"></field>
+	<field type="float" name="pitch"></field>
+	<field type="float" name="yaw"></field>
+	<field type="uint32_t" name="status"></field>
+	</message>
+	<message id="158" name="VISUAL_SETTING">
+	<field type="uint8_t" name="visual_test"></field>
+	<field type="uint8_t" name="isLinear"></field>
+	<field type="uint8_t" name="filter_type"></field>
+	</message>
+	<message id="21" name="MOTION_INFO">
+	  <description>AUV motion information from basic computer periodic transmission</description>
+	  <field type ="double" name ="lng" units ="deg"></field>
+	  <field type ="double" name ="lat" units ="deg"></field>
+	  <field type ="float" name ="depth" units ="m"></field>
+	  <field type ="float" name ="height" units ="m"></field>
+	  <field type ="float" name ="roll" units ="deg"></field>
+	  <field type ="float" name ="pitch" units ="deg"></field>
+	  <field type ="float" name ="yaw" units ="deg"></field>
+	  <field type ="float" name ="course" units ="deg"></field>
+	  <field type ="float" name ="vel" units ="m/s"></field>
+	  <field type ="float" name ="p" units ="deg/s"></field>
+	  <field type ="float" name ="q" units ="deg/s"></field>
+	  <field type ="float" name ="r" units ="deg/s"></field>
+	</message>
+	<message id="1" name="AUV_FIELD_STATUS">
+      <description>AUV state feedback in field trial from motion computer to GCS </description>
+      <field type ="int32_t" name="lat" units ="degE7"></field>
+      <field type ="int32_t" name="lon" units ="degE7"></field>
+	  <field type ="float" name="x" units ="m"></field>
+      <field type ="float" name="y" units ="m"></field>
+	  <field type ="int16_t" name="depth" units ="mE3"></field>
+	  <field type ="int16_t" name="height" units ="mE2"></field>
+      <field type ="int16_t" name="roll" units ="degE2"></field>
+      <field type ="int16_t" name="pitch" units ="degE2"></field>
+      <field type ="float" name="yaw" units ="deg"></field>
+	  <field type ="float" name="course" units ="deg"></field>
+	  <field type ="int16_t" name="vel" units ="m/sE2"></field>
+    </message>
+  </messages>
+</mavlink>
