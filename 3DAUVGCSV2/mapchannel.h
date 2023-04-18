@@ -2,7 +2,7 @@
 #define MAPCHANNEL_H
 
 #include <QObject>
-
+#include <QJsonValue>
 class MapChannel : public QObject
 {
     Q_OBJECT
@@ -31,6 +31,7 @@ signals:
     void reloadMapClicked();
     void taskCome(int, int);
     void pointsCome(int, double, double);
+    void revPredictionData(QJsonValue);
 
     /*MapChannel -> html*/
     void addPointClicked(double, double);
@@ -54,6 +55,7 @@ public slots:
     void reloadMap();
     void transTask(int type, int len);
     void transPoints(int id, double lng, double lat);
+    void sendPredictionData(QJsonValue value);
 
     /*MainWindow 调用*/
     void clearAll();

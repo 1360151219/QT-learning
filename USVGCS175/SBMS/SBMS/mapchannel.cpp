@@ -23,6 +23,10 @@ void MapChannel::transTask(int type, int len)
 {
     emit taskCome(type, len);
 }
+void MapChannel::sendPredictionData(QJsonValue value)
+{
+    emit revPredictionData(value);
+}
 
 void MapChannel::transPoints(int id, double lng, double lat)
 {

@@ -682,6 +682,49 @@ void MainWindow::mapInit()
         isOfflineMap = true; });
     connect(this->taskWidget, &TaskWidget::itemChanged, [=](double lng, double lat, int id)
             { mapChannel->movePoint(id, lng, lat); });
+
+    connect(mapChannel, &MapChannel::revPredictionData, [=](QJsonValue _value)
+            {
+                QString filePath = "/Applications/workplace/QT-project/3DAUVGCSV2/output.csv";
+                // 将JSON数据转换成CSV格式
+                QString csvData;
+                QJsonArray jsonArray = _value.toArray();
+                for (const QJsonValue &value : jsonArray) {
+                    QJsonObject jsonObject = value.toObject();
+                    QStringList row;
+                    row << QString::number(jsonObject.value("psi").toDouble());
+                    row << QString::number(jsonObject.value("r").toDouble());
+                    row << QString::number(jsonObject.value("u").toDouble());
+                    row << QString::number(jsonObject.value("v").toDouble());
+                    row << QString::number(jsonObject.value("x").toDouble());
+                    row << QString::number(jsonObject.value("y").toDouble());
+                    csvData.append(row.join(",") + "\n");
+                }
+                // 读取已有数据
+                QString oldData;
+                QFile file(filePath);
+                if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+                {
+                    QTextStream in(&file);
+                    while (!in.atEnd())
+                    {
+                        QString line = in.readLine();
+                        oldData += line + "\n";
+                    }
+                    file.close();
+                }
+
+                // 将新数据添加到已有数据后面
+                QString newData = oldData + csvData.append("\n");
+
+                // 保存CSV文件
+                QFile csvFile(filePath);
+                if (csvFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    qDebug()<<"okk";
+                    QTextStream stream(&csvFile);
+                    stream << newData;
+                    csvFile.close();
+                } });
 }
 
 void MainWindow::on_pushButton_add_point_clicked()

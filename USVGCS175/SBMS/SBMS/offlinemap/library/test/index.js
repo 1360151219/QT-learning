@@ -3,13 +3,12 @@ function test1() {
   let i = 114.42649989999968 // 经度
   let j = 30.5207794 // 纬度
   let y = 0
-  const data = []
+  // const data = []
   addBoat()
   timer1 = setInterval(() => {
-    const [lng, lat] = wgs84tobd09(i, j);
-    data.push({ lng, lat, count: Math.random() * 50 })
-    heatOverlayMap.setDataSet({ max: 50, data })
-
+    // const [lng, lat] = wgs84tobd09(i, j);
+    // data.push({ lng, lat, count: 10 })
+    // heatOverlayMap.setDataSet({ max: 50, data })
     if (!showBoatPosition(0, i, j, y, 0, true, 13)) {
       clearInterval(timer1)
     }

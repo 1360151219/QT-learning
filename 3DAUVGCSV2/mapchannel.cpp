@@ -24,6 +24,11 @@ void MapChannel::transTask(int type, int len)
     emit taskCome(type, len);
 }
 
+void MapChannel::sendPredictionData(QJsonValue value)
+{
+    emit revPredictionData(value);
+}
+
 void MapChannel::transPoints(int id, double lng, double lat)
 {
     emit pointsCome(id, lng, lat);
@@ -31,7 +36,7 @@ void MapChannel::transPoints(int id, double lng, double lat)
 // id, lng, lat, course, depth, hasQuaternion, v, quaternionOpacity
 void MapChannel::updateBoatPos(int id, double lng, double lat, double course, double depth, bool hasQuaternion, double v, double quaternionOpacity)
 {
-    emit boatPosUpdated(id,lng, lat, course, depth, hasQuaternion, v, quaternionOpacity);
+    emit boatPosUpdated(id, lng, lat, course, depth, hasQuaternion, v, quaternionOpacity);
 }
 
 void MapChannel::reloadMap()

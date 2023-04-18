@@ -5,7 +5,6 @@ const L = 0.00944 // 175艇的艇长/海里
     * 【补充说明】：只有添加了无人艇，才可以通过id来对艇的位置进行显示或者显示预测轨迹
     */
 function addBoat() {
-  console.log('add');
   let boatMarker = new BMap.Marker;
   let boatIcon = new BMap.Symbol(BMap_Symbol_SHAPE_FORWARD_CLOSED_ARROW, { //BMap_Symbol_SHAPE_PLANE
     scale: 1.5,
@@ -13,7 +12,7 @@ function addBoat() {
     fillColor: getRandomColor(boatMarkerArray.length),
     fillOpacity: 0.8
   });
-  let boatLabel = new BMap.Label(`${boatMarkerArray.length}`, { offset: new BMap.Size(20, -20) });
+  let boatLabel = new BMap.Label("0mD，0mH", { offset: new BMap.Size(20, -20) });
   let boatPoints = new Array();  //保存艇的轨迹点
   let boatTrackPolyline = new BMap.Polyline([], { strokeColor: getRandomColor(boatMarkerArray.length), strokeWeight: 2, strokeOpacity: 0.5 });
   let predPoints = [];
@@ -44,10 +43,11 @@ function addBoat() {
 function showBoatPosition(id, lng, lat, course, depth, hasQuaternion, v, quaternionOpacity = 0.1) {
   var currentPosition = wgs84tobd09(lng, lat);
   let quaterPolygona = quaternionArray[id]
+  // todo 热力图
+
   // ===== 四元安全领域绘制
   if (hasQuaternion) {
     const { r_fore, r_aft, r_starb, r_port } = Quaternion(v, L)
-    // console.log(r_fore,r_aft,r_port,r_starb);
     const obj = {
       fore: newCoordinate(lng, lat, r_fore, 0), // 从上开始顺时针
       starb: newCoordinate(lng, lat, r_starb, 90),
@@ -58,7 +58,6 @@ function showBoatPosition(id, lng, lat, course, depth, hasQuaternion, v, quatern
     const y_axis = ((obj.fore[1] - obj.aft[1]))
     map.removeOverlay(quaterPolygona)
     let a = ellipse({ lng: currentPosition[0], lat: currentPosition[1] }, x_axis, y_axis, 180 - course);
-    // quaterPolygona = new BMap.Polygon(Object.keys(obj).map(key => new BMap.Point(obj[key][0], obj[key][1])), { strokeColor: "black", strokeStyle: 'dashed', strokeWeight: 1, fillOpacity: quaternionOpacity });
     quaterPolygona = new BMap.Polygon(a, { strokeColor: "black", strokeStyle: 'dashed', strokeWeight: 1, fillOpacity: quaternionOpacity });
     quaternionArray[id] = quaterPolygona
   }
@@ -127,6 +126,7 @@ function showBoatPrediction(
   let v = initialV;
   let r = initialR;
   const predPoints = [];
+  const predictionData = [{ x, y, psi: initialPsi, u: initialU, v: initialV, r: initialR }];
   // 初始化：加上原始点
   const initBd09Pos = wgs84tobd09(lng, lat)
   predPoints.push(new BMap.Point(initBd09Pos[0], initBd09Pos[1]))
@@ -160,9 +160,11 @@ function showBoatPrediction(
     v = res.v
     psi = res.psi
     r = res.r
+    predictionData.push({ x, y, psi, u, v, r })
   }
   predPolyline.setPath(predPoints);
   map.addOverlay(predPolyline);
+  window.bridge.sendPredictionData(predictionData)
 }
 
 // 切换无人艇
@@ -186,4 +188,23 @@ function switchTrack(id) {
   map.clearOverlays();
   map.addOverlay(boatTrackPolylineArray[id])
   map.addOverlay(boatMarkerArray[id])
+}
+
+// 启动热力图
+function showHeatOverlayMap() {
+  // ===== 热力图显示深度
+  map.addOverlay(heatOverlayMap)
+  heatOverlayMap.setOptions({
+    gradient: {
+      1: 'rgb(210, 40, 40)',
+      .5: 'rgb(223, 110, 70)',
+      .2: 'rgb(228, 149, 70)',
+      0: 'rgb(192, 215, 63)',
+    }
+  })
+  heatOverlayMap.setDataSet({ max: 50, data: heatData })
+}
+
+function addHeatPoint(lng, lat, count) {
+  heatData.push({ lng, lat, count })
 }
